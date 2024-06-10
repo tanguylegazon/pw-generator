@@ -1,0 +1,332 @@
+@font-face {
+    font-family: 'Source Sans Pro';
+    src: url('../assets/fonts/SourceSansPro-Regular.woff2') format('woff2'),
+    url('../assets/fonts/SourceSansPro-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Source Code Pro';
+    src: url('../assets/fonts/SourceCodePro-Regular.woff2') format('woff2'),
+    url('../assets/fonts/SourceCodePro-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Source Sans Pro';
+    src: url('../assets/fonts/SourceSansPro-Bold.woff2') format('woff2'),
+    url('../assets/fonts/SourceSansPro-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --input-selectable-color: #86868b;
+    --input-selected-color: #007AFF;
+    --button-color: #E5EBF1;
+    --button-color-hover: #C9D8E8;
+    --label-button-color: #E0EFFF;
+    --button-success-color: #34C759;
+
+    --short-transition-duration: 70ms;
+    --long-transition-duration: 120ms;
+}
+
+* {
+    max-width: 100vw;
+    padding: 0;
+    margin: 0;
+}
+
+html {
+    width: auto;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 40px);
+    flex-direction: column;
+    text-align: center;
+    margin: 20px;
+    box-sizing: border-box;
+
+}
+
+input, label {
+    font-family: 'Source Sans Pro', sans-serif;
+    font-weight: normal;
+    outline: 0 solid transparent;
+    transition: outline var(--short-transition-duration) ease;
+}
+
+input, button {
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--input-selectable-color);
+    font-size: 1em;
+}
+
+label {
+}
+
+button {
+    background-color: var(--button-color);
+    cursor: pointer;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-weight: bold;
+    color: black;
+    transition: background-color var(--short-transition-duration) ease;
+}
+
+button:hover {
+    background-color: var(--button-color-hover);
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    background: var(--label-button-color);
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.button.active {
+    background-color: var(--input-selected-color);
+    color: #fff;
+}
+
+input:focus, label:hover, label.button:hover {
+    outline: 4px solid var(--input-selected-color);
+    outline-offset: 2px;
+    transition: outline var(--short-transition-duration) ease, color var(--long-transition-duration) ease, background-color var(--long-transition-duration) ease;;
+}
+
+svg {
+    fill: black;
+}
+
+.visually-hidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+.toggle-button-checkbox {
+    display: none;
+}
+
+.password-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    width: 80vw;
+    max-width: 45em;
+    border-radius: 10px;
+}
+
+.password-inputs {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    width: 100%;
+}
+
+.password-length {
+    display: flex;
+    flex-direction: row;
+    gap: 0;
+}
+
+
+#pw-length {
+    position: relative;
+    width: 4ch;
+    text-align: center;
+    border-radius: 0;
+    z-index: 1;
+}
+
+.password-length button {
+    position: relative;
+    width: 2.55em;
+    aspect-ratio: 1;
+    padding: 0;
+}
+
+#pw-length-decrease {
+    border-right: none;
+    border-radius: 6px 0 0 6px;
+}
+
+#pw-length-increase {
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+}
+
+.password-field {
+    position: relative;
+    width: 100%;
+}
+
+#pw-text {
+    font-family: 'Source Code Pro', monospace;
+    width: calc(100% - 3.38em);
+    padding-right: 40px;
+}
+
+#pw-refresh {
+    all: unset;
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 2em;
+    height: 2.6em;
+    padding: 0 5px 0 3px;
+    border-radius: 0 6px 6px 0;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+#pw-refresh > svg {
+    width: 1.8em;
+    height: 1.8em;
+    vertical-align: middle;
+    fill: var(--input-selectable-color);
+    transition: fill var(--long-transition-duration) ease;
+}
+
+#pw-refresh > svg:hover {
+    fill: black;
+}
+
+#pw-copy {
+    height: 2.6em;
+    aspect-ratio: 1;
+    padding: 0;
+}
+
+#pw-copy > span {
+    display: none;
+}
+
+#pw-copy > svg {
+    width: 1.8em;
+    height: 1.8em;
+    vertical-align: middle;
+}
+
+#pw-copy-message {
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    font-family: 'Source Sans Pro', sans-serif;
+    font-weight: bold;
+    font-size: 1em;
+    color: white;
+
+    padding: 10px 14px;
+    border-radius: 4px;
+    background-color: var(--button-success-color);
+
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--long-transition-duration) ease, visibility var(--long-transition-duration) ease;
+}
+
+svg.rotate {
+    animation: rotation 800ms ease-in;
+}
+
+.password-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: center;
+    width: 100%;
+}
+
+#include-symbols-label, #avoid-similar-characters-label {
+    user-select: none;
+}
+
+@media (max-width: 600px) {
+    .password-form {
+        min-width: 100%;
+    }
+
+    .password-inputs {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .password-length {
+        max-width: fit-content;
+    }
+
+    .password-length, #pw-copy {
+        flex: 1 0 auto;
+        order: 0;
+    }
+
+    #pw-copy {
+        width: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 0 8px;
+    }
+
+    #pw-copy > span {
+        display: inline;
+    }
+
+    .password-field {
+        flex: 2 0 auto;
+        order: 1;
+    }
+}
+
+@media (max-width: 420px) {
+    #pw-copy > span {
+        display: none;
+    }
+}
+
+@keyframes rotation {
+    0% {
+        transform: rotate(0deg);
+    }
+    20% {
+        transform: rotate(-20deg);
+    }
+    60% {
+        transform: rotate(180deg);
+    }
+    80% {
+        transform: rotate(165deg);
+    }
+    100% {
+        transform: rotate(180deg);
+    }
+}
