@@ -5,5 +5,5 @@ However, this project includes third-party projects, which are licensed under th
 
 ## Heroicons
 
-License type: MIT License
+License type: MIT License<br/>
 License file: https://github.com/tailwindlabs/heroicons/blob/master/LICENSE
