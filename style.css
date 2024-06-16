@@ -1,3 +1,8 @@
+/*
+This file contains fonts from the Source Sans family.
+Source Sans Font Family is made by Adobe and licensed under SIL Open Font License 1.1.
+Terms and conditions are available at https://github.com/adobe-fonts/source-sans/blob/release/LICENSE.md
+*/
 @font-face {
     font-family: 'Source Sans Pro';
     src: url('/assets/fonts/SourceSansPro-Regular.woff2') format('woff2'),
