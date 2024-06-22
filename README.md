@@ -9,7 +9,7 @@ mind, all the code is run client-side, no data is sent to a server.
 - Choose the length of the password.
 - Choose to include special characters and/or exclude ambiguous characters.
 
-## Project Files
+## Project files
 
 - `index.html`: The main project page.
 - `style.css`: CSS styles for layout and visual elements.
