@@ -80,9 +80,6 @@ input, button {
     font-size: 1em;
 }
 
-label {
-}
-
 button {
     background-color: var(--button-color);
     cursor: pointer;
@@ -103,6 +100,7 @@ button:hover {
     cursor: pointer;
     border-radius: 5px;
     text-align: center;
+    user-select: none;
 }
 
 .button.active {
@@ -267,10 +265,6 @@ svg.rotate {
     gap: 10px;
     justify-content: center;
     width: 100%;
-}
-
-#include-symbols-label, #avoid-similar-characters-label {
-    user-select: none;
 }
 
 @media (max-width: 600px) {
