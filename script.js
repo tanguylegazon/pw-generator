@@ -9,9 +9,31 @@ const passwordLengthInput = document.getElementById('pw-length');
 const refreshButton = document.getElementById('pw-refresh');
 const includeSymbolsCheckbox = document.getElementById('include-symbols');
 const avoidComplicatedCharactersCheckbox = document.getElementById('avoid-complicated-characters');
+const includeSymbolsLabel = document.getElementById('include-symbols-label');
+const avoidComplicatedCharactersLabel = document.getElementById('avoid-complicated-characters-label');
 
 includeSymbolsCheckbox.checked = true;
 avoidComplicatedCharactersCheckbox.checked = false;
+
+
+/*****************
+ * Local storage *
+ *****************/
+if (localStorage.getItem('includeSymbols') === null) {
+    localStorage.setItem('includeSymbols', includeSymbolsCheckbox.checked);
+} else {
+    includeSymbolsCheckbox.checked = localStorage.getItem('includeSymbols') === 'true';
+}
+
+if (localStorage.getItem('avoidComplicatedCharacters') === null) {
+    localStorage.setItem('avoidComplicatedCharacters', avoidComplicatedCharactersCheckbox.checked);
+} else {
+    avoidComplicatedCharactersCheckbox.checked = localStorage.getItem('avoidComplicatedCharacters') === 'true';
+}
+
+includeSymbolsCheckbox.checked ? includeSymbolsLabel.classList.add('active') : includeSymbolsLabel.classList.remove('active');
+avoidComplicatedCharactersCheckbox.checked ? avoidComplicatedCharactersLabel.classList.add('active') : avoidComplicatedCharactersLabel.classList.remove('active');
+
 
 /***********
  * Charset *
@@ -334,16 +356,15 @@ if ('maxTouchPoints' in navigator && navigator.maxTouchPoints > 0) {
 
 refreshButton.addEventListener('click', updatePassword);
 
-const includeSymbolsLabel = document.getElementById('include-symbols-label');
-const avoidComplicatedCharactersLabel = document.getElementById('avoid-complicated-characters-label');
-
 includeSymbolsCheckbox.addEventListener('click', function () {
     includeSymbolsLabel.classList.toggle('active');
+    localStorage.setItem('includeSymbols', includeSymbolsCheckbox.checked);
     updatePassword();
 });
 
 avoidComplicatedCharactersCheckbox.addEventListener('click', function () {
     avoidComplicatedCharactersLabel.classList.toggle('active');
+    localStorage.setItem('avoidComplicatedCharacters', avoidComplicatedCharactersCheckbox.checked);
     updatePassword();
 });
 
