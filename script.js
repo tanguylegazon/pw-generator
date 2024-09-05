@@ -8,17 +8,17 @@ const script = document.getElementById('pw-text');
 const passwordLengthInput = document.getElementById('pw-length');
 const refreshButton = document.getElementById('pw-refresh');
 const includeSymbolsCheckbox = document.getElementById('include-symbols');
-const avoidSimilarCharactersCheckbox = document.getElementById('avoid-similar-characters');
+const avoidComplicatedCharactersCheckbox = document.getElementById('avoid-complicated-characters');
 
 includeSymbolsCheckbox.checked = true;
-avoidSimilarCharactersCheckbox.checked = false;
+avoidComplicatedCharactersCheckbox.checked = false;
 
 /***********
  * Charset *
  ***********/
 let charset = "";
 let charsetLength = 0;
-const similarCharset = "1Il0Oo`'\"";
+const complicatedCharset = "1Il0Oo\"',;[\\]^`{|}~";
 
 let digitCharset = "";
 for (let i = 48; i <= 57; ++i) digitCharset += String.fromCharCode(i);
@@ -40,8 +40,8 @@ for (let i = 123; i <= 126; ++i) symbolCharset += String.fromCharCode(i);
 function updateCharset() {
     charset = includeSymbolsCheckbox.checked ? digitCharset + letterCharset + symbolCharset : digitCharset + letterCharset;
 
-    if (avoidSimilarCharactersCheckbox.checked) {
-        for (let i = 0; i < similarCharset.length; ++i) charset = charset.replace(new RegExp(similarCharset[i], 'g'), '');
+    if (avoidComplicatedCharactersCheckbox.checked) {
+        for (let i = 0; i < complicatedCharset.length; ++i) charset = charset.replace(new RegExp(complicatedCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
     }
 
     charsetLength = charset.length;
@@ -120,7 +120,7 @@ function shuffleString(string) {
 /**
  * @function getSecureRandom
  * @description This function generates a secure random character from the provided character set.
- * If the 'avoidSimilarCharactersCheckbox' is checked, it only generates non commonly confused characters.
+ * If the 'avoidComplicatedCharactersCheckbox' is checked, it only generates non-confusing characters.
  * @param {string} charset - The character set.
  *
  * @returns {string} A single character randomly selected from the provided character set.
@@ -133,7 +133,7 @@ function getSecureRandom(charset) {
             randomValue = window.crypto.getRandomValues(new Uint8Array(1))[0];
         } while (randomValue >= Math.floor(256 / charset.length) * charset.length);
         character = charset.charAt(randomValue % charset.length);
-    } while (avoidSimilarCharactersCheckbox.checked && similarCharset.includes(character));
+    } while (avoidComplicatedCharactersCheckbox.checked && complicatedCharset.includes(character));
 
     return character;
 }
@@ -335,15 +335,15 @@ if ('maxTouchPoints' in navigator && navigator.maxTouchPoints > 0) {
 refreshButton.addEventListener('click', updatePassword);
 
 const includeSymbolsLabel = document.getElementById('include-symbols-label');
-const avoidSimilarCharactersLabel = document.getElementById('avoid-similar-characters-label');
+const avoidComplicatedCharactersLabel = document.getElementById('avoid-complicated-characters-label');
 
 includeSymbolsCheckbox.addEventListener('click', function () {
     includeSymbolsLabel.classList.toggle('active');
     updatePassword();
 });
 
-avoidSimilarCharactersCheckbox.addEventListener('click', function () {
-    avoidSimilarCharactersLabel.classList.toggle('active');
+avoidComplicatedCharactersCheckbox.addEventListener('click', function () {
+    avoidComplicatedCharactersLabel.classList.toggle('active');
     updatePassword();
 });
 
