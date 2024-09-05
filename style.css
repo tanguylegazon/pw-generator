@@ -63,7 +63,6 @@ body {
     text-align: center;
     margin: 20px;
     box-sizing: border-box;
-
 }
 
 input, label {
@@ -77,6 +76,7 @@ input, button {
     padding: 10px 12px;
     border-radius: 6px;
     border: 1px solid var(--input-selectable-color);
+    box-sizing: border-box;
     font-size: 1em;
 }
 
@@ -149,18 +149,23 @@ svg {
     flex-direction: row;
     gap: 20px;
     width: 100%;
+    height: 2.6em;
 }
 
 .password-length {
     display: flex;
     flex-direction: row;
     gap: 0;
+    height: 100%;
 }
 
+.password-length > * {
+    height: 2.6em;
+}
 
 #pw-length {
     position: relative;
-    width: 4ch;
+    width: 3.5em;
     text-align: center;
     border-radius: 0;
     z-index: 1;
@@ -190,7 +195,8 @@ svg {
 
 #pw-text {
     font-family: 'Source Code Pro', monospace;
-    width: calc(100% - 3.38em);
+    width: 100%;
+    height: 2.6em;
     padding-right: 40px;
 }
 
@@ -276,6 +282,7 @@ svg.rotate {
         flex-direction: row;
         flex-wrap: wrap;
         gap: 10px;
+        height: fit-content;
     }
 
     .password-length {
