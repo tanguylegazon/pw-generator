@@ -43,7 +43,6 @@ body {
 }
 
 .info svg {
-    fill: #8bd7fc;
     height: 1.8em;
 }
 
@@ -75,7 +74,7 @@ body {
 
 #pw-field {
     font-family: ui-monospace, monospace;
-    width: 20.5ch;
+    width: 24.5ch;
     padding-right: calc(var(--button-height) - 2px);
 }
 
@@ -85,6 +84,14 @@ body {
     right: 1px;
     transform: translateY(-50%);
     backdrop-filter: none;
+}
+
+#pw-refresh svg {
+    will-change: rotate;
+}
+
+#pw-refresh svg.rotate {
+    animation: rotation 750ms ease-in;
 }
 
 @media (max-width: 40rem) {
@@ -115,10 +122,10 @@ body {
     20% {
         transform: rotate(-20deg);
     }
-    60% {
+    70% {
         transform: rotate(180deg);
     }
-    80% {
+    85% {
         transform: rotate(165deg);
     }
     100% {

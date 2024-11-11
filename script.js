@@ -363,6 +363,7 @@ easyCharacters.addEventListener('click', function () {
 
 const refreshButtonSVG = refreshButton.querySelector('svg');
 refreshButton.onclick = function () {
+    clearTimeout(timeoutId);
     refreshButtonSVG.classList.add('rotate');
-    setTimeout(() => refreshButtonSVG.classList.remove('rotate'), 800);
+    timeoutId = setTimeout(() => refreshButtonSVG.classList.remove('rotate'), 750);
 };
