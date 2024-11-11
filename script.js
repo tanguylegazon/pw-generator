@@ -264,7 +264,7 @@ function addIncreaseDecreaseListeners(button, operation, condition) {
                     operation();
                     updatePassword();
                 }
-            }, 25);
+            }, 20);
         }, 900);
     }
 
@@ -313,17 +313,24 @@ copyButton.addEventListener('click', function () {
     script.select();
 
     navigator.clipboard.writeText(passwordText).then(() => {
-/*        copyMessage.style.opacity = '1';
-        copyMessage.style.visibility = 'visible';*/
+        const copiedElements = copyButton.querySelectorAll('.copied');
+        const copyElements = copyButton.querySelectorAll('.copy');
+
+        setTimeout(() => {
+            copiedElements.forEach(element => element.style.opacity = '1');
+        }, 150);
+
+
+        copyElements.forEach(element => element.style.opacity = '0');
 
         if (timeoutId) {
             clearTimeout(timeoutId);
         }
 
         timeoutId = setTimeout(() => {
-/*            copyMessage.style.opacity = '0';
-            copyMessage.style.visibility = 'hidden';*/
-        }, 4500);
+            copiedElements.forEach(element => element.style.opacity = '0');
+            copyElements.forEach(element => element.style.opacity = '1');
+        }, 2500);
     });
 });
 
