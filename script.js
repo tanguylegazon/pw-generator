@@ -4,13 +4,11 @@
  */
 const minPasswordLength = 1;
 
-const script = document.getElementById('pw-text');
+const script = document.getElementById('pw-field');
 const passwordLengthInput = document.getElementById('pw-length');
 const refreshButton = document.getElementById('pw-refresh');
 const includeSymbolsCheckbox = document.getElementById('include-symbols');
 const easyCharacters = document.getElementById('easy-characters');
-const includeSymbolsLabel = document.getElementById('include-symbols-label');
-const avoidComplicatedCharactersLabel = document.getElementById('avoid-complicated-characters-label');
 
 includeSymbolsCheckbox.checked = true;
 easyCharacters.checked = false;
@@ -306,7 +304,7 @@ addIncreaseDecreaseListeners(decreaseButton, function () {
 /****************************
  * Copy to clipboard button *
  ****************************/
-/*const copyMessage = document.getElementById('pw-copy-message');
+/*const copyMessage = document.getElementById('pw-copy-message');*/
 const copyButton = document.getElementById('pw-copy');
 
 copyButton.addEventListener('click', function () {
@@ -315,19 +313,19 @@ copyButton.addEventListener('click', function () {
     script.select();
 
     navigator.clipboard.writeText(passwordText).then(() => {
-        copyMessage.style.opacity = '1';
-        copyMessage.style.visibility = 'visible';
+/*        copyMessage.style.opacity = '1';
+        copyMessage.style.visibility = 'visible';*/
 
         if (timeoutId) {
             clearTimeout(timeoutId);
         }
 
         timeoutId = setTimeout(() => {
-            copyMessage.style.opacity = '0';
-            copyMessage.style.visibility = 'hidden';
+/*            copyMessage.style.opacity = '0';
+            copyMessage.style.visibility = 'hidden';*/
         }, 4500);
     });
-});*/
+});
 
 
 /*****************
