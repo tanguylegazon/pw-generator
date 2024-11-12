@@ -23,10 +23,10 @@ if (localStorage.getItem('includeSymbols') === null) {
     includeSymbolsCheckbox.checked = localStorage.getItem('includeSymbols') === 'true';
 }
 
-if (localStorage.getItem('avoidComplicatedCharacters') === null) {
-    localStorage.setItem('avoidComplicatedCharacters', easyCharacters.checked);
+if (localStorage.getItem('easyCharacters') === null) {
+    localStorage.setItem('easyCharacters', easyCharacters.checked);
 } else {
-    easyCharacters.checked = localStorage.getItem('avoidComplicatedCharacters') === 'true';
+    easyCharacters.checked = localStorage.getItem('easyCharacters') === 'true';
 }
 
 
@@ -35,7 +35,7 @@ if (localStorage.getItem('avoidComplicatedCharacters') === null) {
  ***********/
 let charset = "";
 let charsetLength = 0;
-const complicatedCharset = "1Il0Oo\"',;[\\]^`{|}~";
+const ambiguousCharset = "012CcIilOoXxZz!\"$&'+,/:;@[\\]^`{|}~";
 
 let digitCharset = "";
 for (let i = 48; i <= 57; ++i) digitCharset += String.fromCharCode(i);
@@ -43,11 +43,7 @@ for (let i = 48; i <= 57; ++i) digitCharset += String.fromCharCode(i);
 let letterCharset = "";
 for (let i = 65, j = 97; i <= 90; ++i, ++j) letterCharset += String.fromCharCode(i) + String.fromCharCode(j);
 
-let symbolCharset = "";
-for (let i = 33; i <= 47; ++i) symbolCharset += String.fromCharCode(i);
-for (let i = 58; i <= 64; ++i) symbolCharset += String.fromCharCode(i);
-for (let i = 91; i <= 96; ++i) symbolCharset += String.fromCharCode(i);
-for (let i = 123; i <= 126; ++i) symbolCharset += String.fromCharCode(i);
+let symbolCharset = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
 /**
  * @function updateCharset
@@ -58,7 +54,7 @@ function updateCharset() {
     charset = includeSymbolsCheckbox.checked ? digitCharset + letterCharset + symbolCharset : digitCharset + letterCharset;
 
     if (easyCharacters.checked) {
-        for (let i = 0; i < complicatedCharset.length; ++i) charset = charset.replace(new RegExp(complicatedCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
+        for (let i = 0; i < ambiguousCharset.length; ++i) charset = charset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
     }
 
     charsetLength = charset.length;
@@ -68,6 +64,11 @@ function updateCharset() {
 /******************
  * Password logic *
  ******************/
+function calculatePasswordEntropy(length, charsetSize) {
+    if (length === 0 || charsetSize === 0) return 0;
+    return Math.round(length * Math.log2(charsetSize));
+}
+
 /**
  * @function textScrambleEffect
  * @description This function creates a scramble effect on the text. It gradually reveals the actual text by randomly
@@ -150,7 +151,7 @@ function getSecureRandom(charset) {
             randomValue = window.crypto.getRandomValues(new Uint8Array(1))[0];
         } while (randomValue >= Math.floor(256 / charset.length) * charset.length);
         character = charset.charAt(randomValue % charset.length);
-    } while (easyCharacters.checked && complicatedCharset.includes(character));
+    } while (easyCharacters.checked && ambiguousCharset.includes(character));
 
     return character;
 }
@@ -179,6 +180,8 @@ function generatePassword() {
     for (let i = result.length; i < length; ++i) {
         result += getSecureRandom(charset);
     }
+
+    console.log(Math.min(calculatePasswordEntropy(length, charsetLength) / 128, 1));
 
     textScrambleEffect(shuffleString(result));
     return shuffleString(result);
@@ -364,7 +367,7 @@ includeSymbolsCheckbox.addEventListener('click', function () {
 });
 
 easyCharacters.addEventListener('click', function () {
-    localStorage.setItem('avoidComplicatedCharacters', easyCharacters.checked);
+    localStorage.setItem('easyCharacters', easyCharacters.checked);
     updatePassword();
 });
 
