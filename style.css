@@ -100,7 +100,7 @@ body {
 }
 
 .password-options {
-    row-gap: 1.15em;
+    row-gap: 1.05em;
 }
 
 @media (max-width: 45rem) {
