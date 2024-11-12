@@ -235,9 +235,9 @@ function updateEntropyBar(entropy) {
     } else if (entropy < 75) {
         entropyBar.style.backgroundColor = '#f59e0b'; // amber-500
     } else if (entropy < 112) {
-        entropyBar.style.backgroundColor = '#20be5a'; // green-520
+        entropyBar.style.backgroundColor = '#10b981'; // emerald-500
     } else {
-        entropyBar.style.backgroundColor = '#059669'; // emerald-600
+        entropyBar.style.backgroundColor = '#047857'; // green-700
     }
 
     entropyBar.style.width = Math.min(entropy / 1.28, 100) + '%';
