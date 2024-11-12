@@ -68,6 +68,7 @@ body {
     right: 1px;
     transform: translateY(-50%);
     backdrop-filter: none;
+    z-index: 10;
 }
 
 #pw-refresh svg {
@@ -76,6 +77,29 @@ body {
 
 #pw-refresh svg.rotate {
     animation: rotation 750ms ease-in;
+}
+
+.password-entropy {
+    display: flex;
+    align-items: flex-end;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    font-size: 1.25em;
+    height: 100%;
+    padding: 0 .2em;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-sizing: border-box;
+    border: .08em solid transparent;
+}
+
+#entropy-bar {
+    width: 0;
+    background-color: #20be5a; /* green-520 */
+    height: .1em;
+    border-radius: .2em;
+    transition: background-color var(--duration-long) ease, width var(--duration-long) ease;
 }
 
 #pw-copy .copied {

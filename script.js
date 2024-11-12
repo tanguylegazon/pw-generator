@@ -181,7 +181,8 @@ function generatePassword() {
         result += getSecureRandom(charset);
     }
 
-    console.log(Math.min(calculatePasswordEntropy(length, charsetLength) / 128, 1));
+    const entropy = calculatePasswordEntropy(length, charsetLength);
+    updateEntropyBar(entropy);
 
     textScrambleEffect(shuffleString(result));
     return shuffleString(result);
@@ -220,6 +221,27 @@ passwordLengthInput.addEventListener('blur', function () {
         updatePassword();
     }
 });
+
+/**
+ * @function updateEntropyBar
+ * @description Updates the color and width of the entropy bar based on the entropy value. The bar width is maxed out at 128 bits of entropy.
+ * @param {number} entropy - The entropy value of the password.
+ */
+function updateEntropyBar(entropy) {
+    const entropyBar = document.getElementById('entropy-bar');
+
+    if (entropy < 42) {
+        entropyBar.style.backgroundColor = '#ca2121'; // red-650
+    } else if (entropy < 75) {
+        entropyBar.style.backgroundColor = '#f59e0b'; // amber-500
+    } else if (entropy < 112) {
+        entropyBar.style.backgroundColor = '#20be5a'; // green-520
+    } else {
+        entropyBar.style.backgroundColor = '#059669'; // emerald-600
+    }
+
+    entropyBar.style.width = Math.min(entropy / 1.28, 100) + '%';
+}
 
 updatePassword();
 
