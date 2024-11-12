@@ -76,7 +76,7 @@ function calculatePasswordEntropy(length, charsetSize) {
  * @param {string} text - The text to be scrambled.
  */
 function textScrambleEffect(text) {
-    const baseDuration = 60;
+    const baseDuration = 70;
     const durationVariance = 0.4;
     let textArray = new Array(text.length).fill('');
 
