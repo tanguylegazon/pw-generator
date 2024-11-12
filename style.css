@@ -1,3 +1,7 @@
+:root {
+    --btn-breakpoint: calc(2.5 * var(--btn-width));
+}
+
 body {
     margin: 0;
     padding: 0;
@@ -12,7 +16,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2em;
+    gap: 2.2em;
     padding: 30px;
 }
 
@@ -34,7 +38,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 2.2em;
-    row-gap: 14px;
+    row-gap: .9em;
 }
 
 .password-length {
@@ -95,6 +99,10 @@ body {
     font-weight: 600;
 }
 
+.password-options {
+    row-gap: 1.15em;
+}
+
 @media (max-width: 45rem) {
     .password-field {
         order: 1;
@@ -106,6 +114,17 @@ body {
 
     .password-inputs {
         justify-content: space-between;
+    }
+}
+
+@media (max-width: 35rem) {
+    .password-options {
+        margin-top: 1em;
+    }
+
+    .password-options .btn {
+        width: 100%;
+        box-shadow: none;
     }
 }
 
