@@ -1,10 +1,16 @@
 /**
- * @constant minPasswordLength
- * @description The minimum length that a script can be.
+ * @constant {number} minPasswordLength
+ * @description The minimum length that a password can be.
  */
 const minPasswordLength = 1;
 
-const script = document.getElementById('pw-field');
+/**
+ * @constant {number} entropyForFullBar
+ * @description The entropy value (in bits) required to completely fill the password strength bar.
+ */
+const entropyForFullBar = 128;
+
+const password = document.getElementById('pw-field');
 const passwordLengthInput = document.getElementById('pw-length');
 const refreshButton = document.getElementById('pw-refresh');
 const includeSymbolsCheckbox = document.getElementById('include-symbols');
@@ -37,26 +43,34 @@ let charset = "";
 let charsetLength = 0;
 const ambiguousCharset = "012CcIilOoXxZz!\"$&'+,/:;@[\\]^`{|}~";
 
-let digitCharset = "";
-for (let i = 48; i <= 57; ++i) digitCharset += String.fromCharCode(i);
+const digits = "0123456789";
+const letters = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz";
+const symbols = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
-let letterCharset = "";
-for (let i = 65, j = 97; i <= 90; ++i, ++j) letterCharset += String.fromCharCode(i) + String.fromCharCode(j);
-
-let symbolCharset = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+let digitCharset = digits;
+let letterCharset = letters;
+let symbolCharset = symbols;
 
 /**
  * @function updateCharset
- * @description This function concatenates the character sets for digits, letters, and symbols to form a complete character set.
- * @returns {string} The concatenated string of digitCharset, letterCharset, and symbolCharset.
+ * @description This function removes ambiguous characters from the character sets if the 'easyCharacters' checkbox is
+ * checked. It then concatenates the character sets for digitCharset, letterCharset, and symbolCharset to form a
+ * complete character set.
+ *
+ * @returns {string} The complete character set.
  */
 function updateCharset() {
-    charset = includeSymbolsCheckbox.checked ? digitCharset + letterCharset + symbolCharset : digitCharset + letterCharset;
-
     if (easyCharacters.checked) {
-        for (let i = 0; i < ambiguousCharset.length; ++i) charset = charset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
+        for (let i = 0; i < ambiguousCharset.length; ++i) digitCharset = digitCharset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
+        for (let i = 0; i < ambiguousCharset.length; ++i) letterCharset = letterCharset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
+        for (let i = 0; i < ambiguousCharset.length; ++i) symbolCharset = symbolCharset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
+    } else {
+        digitCharset = digits;
+        letterCharset = letters;
+        symbolCharset = symbols;
     }
 
+    charset = includeSymbolsCheckbox.checked ? digitCharset + letterCharset + symbolCharset : digitCharset + letterCharset;
     charsetLength = charset.length;
 }
 
@@ -64,15 +78,26 @@ function updateCharset() {
 /******************
  * Password logic *
  ******************/
-function calculatePasswordEntropy(length, charsetSize) {
-    if (length === 0 || charsetSize === 0) return 0;
-    return Math.round(length * Math.log2(charsetSize));
+function calculatePasswordEntropy(length) {
+    if (length === 0 || charsetLength === 0) return 0;
+    if (length >= 3) {
+        let entropy = (length - 3) * Math.log2(charsetLength) + Math.log2(digitCharset.length) + Math.log2(letterCharset.length);
+
+        if (includeSymbolsCheckbox.checked) {
+            entropy += Math.log2(symbolCharset.length);
+        } else {
+            entropy += Math.log2(charsetLength);
+        }
+        return Math.round(entropy);
+    } else {
+        return Math.round(length * Math.log2(charsetLength));
+    }
 }
 
 /**
  * @function textScrambleEffect
  * @description This function creates a scramble effect on the text. It gradually reveals the actual text by randomly
- * replacing characters in the text with characters from the charset .
+ * replacing characters in the text with characters from the character set.
  * @param {string} text - The text to be scrambled.
  */
 function textScrambleEffect(text) {
@@ -101,7 +126,7 @@ function textScrambleEffect(text) {
             }
         }
 
-        script.value = textArray.join('');
+        password.value = textArray.join('');
 
         if (allDone) {
             clearInterval(intervalId);
@@ -158,14 +183,14 @@ function getSecureRandom(charset) {
 
 /**
  * @function generatePassword
- * @description This function generates a script based on the user's input for length and whether to include symbols.
- * It ensures that the script contains at least one digit, one letter, and one symbol (if symbols are included).
+ * @description This function generates a password based on the user's input for length and whether to include symbols.
+ * It ensures that the password contains at least one digit, one letter, and one symbol (if symbols are included).
  *
- * @returns {string} The generated script.
+ * @returns {string} The generated password.
  */
 function generatePassword() {
     const length = passwordLengthInput.value;
-    let result = "";  // Initialize result as an empty string
+    let result = "";
 
     updateCharset();
 
@@ -182,6 +207,7 @@ function generatePassword() {
     }
 
     const entropy = calculatePasswordEntropy(length, charsetLength);
+    console.log('Entropy:', entropy);
     updateEntropyBar(entropy);
 
     textScrambleEffect(shuffleString(result));
@@ -190,10 +216,10 @@ function generatePassword() {
 
 /**
  * @function updatePassword
- * @description Updates the displayed script on the webpage by generating a new script and setting it as the text content of the 'script' element.
+ * @description Updates the displayed password on the webpage by generating a new password and setting it as the text content of the 'password' element.
  */
 function updatePassword() {
-    if (passwordLengthInput.value <= 1024) script.value = generatePassword();
+    if (passwordLengthInput.value <= 1024) password.value = generatePassword();
 }
 
 let lastValidValue = Number(passwordLengthInput.value);
@@ -230,17 +256,17 @@ passwordLengthInput.addEventListener('blur', function () {
 function updateEntropyBar(entropy) {
     const entropyBar = document.getElementById('entropy-bar');
 
-    if (entropy < 42) {
+    if (entropy < 0.35 * entropyForFullBar) {
         entropyBar.style.backgroundColor = '#ca2121'; // red-650
-    } else if (entropy < 75) {
+    } else if (entropy < 0.6 * entropyForFullBar) {
         entropyBar.style.backgroundColor = '#f59e0b'; // amber-500
-    } else if (entropy < 112) {
-        entropyBar.style.backgroundColor = '#1abe86'; // emerald-480
+    } else if (entropy < 0.85 * entropyForFullBar) {
+        entropyBar.style.backgroundColor = '#1ec188'; // emerald-470
     } else {
-        entropyBar.style.backgroundColor = '#169143'; // green-650
+        entropyBar.style.backgroundColor = '#169745'; // green-635
     }
 
-    entropyBar.style.width = Math.min(entropy / 1.28, 100) + '%';
+    entropyBar.style.width = Math.min(entropy / entropyForFullBar * 100, 100) + '%';
 }
 
 updatePassword();
@@ -329,13 +355,12 @@ addIncreaseDecreaseListeners(decreaseButton, function () {
 /****************************
  * Copy to clipboard button *
  ****************************/
-/*const copyMessage = document.getElementById('pw-copy-message');*/
 const copyButton = document.getElementById('pw-copy');
 
 copyButton.addEventListener('click', function () {
-    const passwordText = script.value;
-    script.focus();
-    script.select();
+    const passwordText = password.value;
+    password.focus();
+    password.select();
 
     navigator.clipboard.writeText(passwordText).then(() => {
         const copiedElements = copyButton.querySelectorAll('.copied');
@@ -368,7 +393,7 @@ if ('maxTouchPoints' in navigator && navigator.maxTouchPoints > 0) {
         this.select();
     });
 
-    script.addEventListener('click', function () {
+    password.addEventListener('click', function () {
         this.select();
     });
 } else {
@@ -376,7 +401,7 @@ if ('maxTouchPoints' in navigator && navigator.maxTouchPoints > 0) {
         this.select();
     });
 
-    script.addEventListener('focus', function () {
+    password.addEventListener('focus', function () {
         this.select();
     });
 }
