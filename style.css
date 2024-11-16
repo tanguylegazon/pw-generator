@@ -99,7 +99,7 @@ body {
     width: 0;
     background-color: #21c38b; /* emerald-460 */
     height: .12em;
-    border-radius: .2em;
+    border-radius: .5em;
     transition: background-color var(--duration-long) ease, width var(--duration-long) ease;
 }
 
