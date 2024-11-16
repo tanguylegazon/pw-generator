@@ -87,18 +87,18 @@ body {
     width: 100%;
     font-size: 1.25em;
     height: 100%;
-    padding: 0 .2em;
+    padding: 0 .25em;
     border-radius: var(--border-radius);
     overflow: hidden;
     box-sizing: border-box;
-    border: .08em solid transparent;
+    border: .1em solid transparent;
     pointer-events: none;
 }
 
 #entropy-bar {
     width: 0;
-    background-color: #1ec188; /* emerald-470 */
-    height: .1em;
+    background-color: #21c38b; /* emerald-460 */
+    height: .12em;
     border-radius: .2em;
     transition: background-color var(--duration-long) ease, width var(--duration-long) ease;
 }
