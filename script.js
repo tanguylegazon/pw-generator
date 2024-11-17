@@ -207,7 +207,6 @@ function generatePassword() {
     }
 
     const entropy = calculatePasswordEntropy(length, charsetLength);
-    console.log('Entropy:', entropy);
     updateEntropyBar(entropy);
 
     textScrambleEffect(shuffleString(result));
@@ -369,7 +368,6 @@ copyButton.addEventListener('click', function () {
         setTimeout(() => {
             copiedElements.forEach(element => element.style.opacity = '1');
         }, 150);
-
 
         copyElements.forEach(element => element.style.opacity = '0');
 
