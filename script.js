@@ -44,33 +44,37 @@ let charsetLength = 0;
 const ambiguousCharset = "012CcIilOoXxZz!\"$&'+,/:;@[\\]^`{|}~";
 
 const digits = "0123456789";
-const letters = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz";
+const lowerCase = "abcdefghijklmnopqrstuvwxyz";
+const upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const symbols = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
 let digitCharset = digits;
-let letterCharset = letters;
+let lowerCaseCharset = lowerCase;
+let upperCaseCharset = upperCase;
 let symbolCharset = symbols;
 
 /**
  * @function updateCharset
  * @description This function removes ambiguous characters from the character sets if the 'easyCharacters' checkbox is
- * checked. It then concatenates the character sets for digitCharset, letterCharset, and symbolCharset to form a
- * complete character set.
+ * checked. It then concatenates the character sets for digitCharset, lowerCaseCharset, upperCaseCharset, and
+ * symbolCharset to form a complete character set.
  *
  * @returns {string} The complete character set.
  */
 function updateCharset() {
     if (easyCharacters.checked) {
         for (let i = 0; i < ambiguousCharset.length; ++i) digitCharset = digitCharset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
-        for (let i = 0; i < ambiguousCharset.length; ++i) letterCharset = letterCharset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
+        for (let i = 0; i < ambiguousCharset.length; ++i) lowerCaseCharset = lowerCaseCharset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
+        for (let i = 0; i < ambiguousCharset.length; ++i) upperCaseCharset = upperCaseCharset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
         for (let i = 0; i < ambiguousCharset.length; ++i) symbolCharset = symbolCharset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
     } else {
         digitCharset = digits;
-        letterCharset = letters;
+        lowerCaseCharset = lowerCase;
+        upperCaseCharset = upperCase;
         symbolCharset = symbols;
     }
 
-    charset = includeSymbolsCheckbox.checked ? digitCharset + letterCharset + symbolCharset : digitCharset + letterCharset;
+    charset = includeSymbolsCheckbox.checked ? digitCharset + lowerCaseCharset + upperCaseCharset + symbolCharset : digitCharset + lowerCaseCharset + upperCaseCharset;
     charsetLength = charset.length;
 }
 
@@ -80,14 +84,22 @@ function updateCharset() {
  ******************/
 function calculatePasswordEntropy(length) {
     if (length === 0 || charsetLength === 0) return 0;
-    if (length >= 3) {
-        let entropy = (length - 3) * Math.log2(charsetLength) + Math.log2(digitCharset.length) + Math.log2(letterCharset.length);
+    if (length >= 4) {
+        let entropy = 0;
 
-        if (includeSymbolsCheckbox.checked) {
+        entropy =
+            (length - (includeSymbolsCheckbox.checked ? 4 : 3)) * Math.log2(charsetLength)
+            + Math.log2(digitCharset.length)
+            + Math.log2(lowerCaseCharset.length)
+            + Math.log2(upperCaseCharset.length)
+            + (includeSymbolsCheckbox.checked ? Math.log2(symbolCharset.length) : 0);
+
+         if (includeSymbolsCheckbox.checked) {
             entropy += Math.log2(symbolCharset.length);
         } else {
             entropy += Math.log2(charsetLength);
         }
+
         return Math.round(entropy);
     } else {
         return Math.round(length * Math.log2(charsetLength));
@@ -194,9 +206,10 @@ function generatePassword() {
 
     updateCharset();
 
-    if (length >= 3) {
+    if (length >= 4) {
         result += getSecureRandom(digitCharset);
-        result += getSecureRandom(letterCharset);
+        result += getSecureRandom(lowerCaseCharset);
+        result += getSecureRandom(upperCaseCharset);
         if (includeSymbolsCheckbox.checked) {
             result += getSecureRandom(symbolCharset);
         }
