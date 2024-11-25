@@ -21,7 +21,7 @@ mind, all the code is run client-side, no data is sent to a server.
 To use this generator, you can either:
 
 1. Access the live version at [tanguy-portfolio.com/password](https://tanguy-portfolio.com/password).
-2. Clone the repository and open the `index.html` in your web browser.
+2. Clone the repository and open `index.html` in your web browser.
 
 ## License and third-party licenses
 
