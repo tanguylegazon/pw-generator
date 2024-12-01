@@ -153,7 +153,7 @@ body {
     }
 }
 
-@media (max-width: 45rem) and (min-width: 24em) {
+@media (max-width: 45em) and (min-width: 24em) {
     #pw-copy {
         border-radius: var(--border-radius);
         aspect-ratio: unset;
@@ -164,6 +164,11 @@ body {
     }
 }
 
+@media (max-height: 26rem) {
+    .info-banner, .github-banner {
+        display: none;
+    }
+}
 
 @keyframes rotation {
     0% {
