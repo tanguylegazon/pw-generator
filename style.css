@@ -153,14 +153,22 @@ body {
     }
 }
 
-@media (max-width: 45em) and (min-width: 24em) {
-    #pw-copy {
-        border-radius: var(--border-radius);
-        aspect-ratio: unset;
+@media (max-width: 45rem) {
+    @media (min-width: 24rem) {
+        #pw-copy {
+            border-radius: var(--border-radius);
+            aspect-ratio: unset;
+        }
+
+        #pw-copy span {
+            display: inline;
+        }
     }
 
-    #pw-copy span {
-        display: inline;
+    @media (max-height: 36rem) {
+        .info-banner, .github-banner {
+            display: none;
+        }
     }
 }
 
