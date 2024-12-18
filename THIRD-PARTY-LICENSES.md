@@ -3,7 +3,7 @@ However, this project includes third-party components, which are distributed und
 
 # List of third-party components
 
-- [tanguylegazon's Custom CSS](#tanguylegazons-custom-css)
+- [tanguylegazon's Custom CSS](#custom-css)
 - [Tailwind Labs' Heroicons v2.2.0](#heroicons-v220)
 
 # Licenses
