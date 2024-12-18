@@ -39,7 +39,7 @@ SOFTWARE.
 
 ## Heroicons v2.2.0
 
-The project [Heroicons v2.2.0](https://github.com/tailwindlabs/heroicons/) is licensed under the
+The project [Heroicons v2.2.0](https://github.com/tailwindlabs/heroicons/tree/v2.2.0) is licensed under the
 [MIT License](https://github.com/tailwindlabs/heroicons/blob/v2.2.0/LICENSE).
 
 ```text
