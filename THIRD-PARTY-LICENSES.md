@@ -10,7 +10,7 @@ However, this project includes third-party components, which are distributed und
 
 ## Custom CSS
 
-The [tanguylegazon's Custom CSS](https://github.com/tanguylegazon/custom-css/) project is licensed under the
+The [tanguylegazon's Custom CSS](https://github.com/tanguylegazon/custom-css) project is licensed under the
 [MIT License](https://github.com/tanguylegazon/custom-css/blob/main/LICENSE).
 
 ```text
