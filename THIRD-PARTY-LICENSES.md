@@ -4,7 +4,7 @@ However, this project includes third-party components, which are distributed und
 # List of third-party components
 
 - [tanguylegazon's Custom CSS](#tanguylegazons-custom-css)
-- [Heroicons v2.2.0](#heroicons-v2.2.0)
+- [Heroicons v2.2.0](#heroicons-v220)
 
 # Licenses
 
