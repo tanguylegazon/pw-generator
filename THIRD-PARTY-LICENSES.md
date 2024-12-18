@@ -1,11 +1,11 @@
 # License overview of included third-party projects
 
-This project is licensed under the terms of the [MIT License](LICENSE).
+This project is licensed under the terms of the [Mozilla Public License Version 2.0](LICENSE).
 However, this project includes third-party components, which are distributed under their own respective licenses.
 
 ## Heroicons v2.2.0
 
-The project Heroicons v2.2.0 is licensed under the  [MIT License](https://github.com/tailwindlabs/heroicons/blob/v2.2.0/LICENSE).
+The project Heroicons v2.2.0 is licensed under the [MIT License](https://github.com/tailwindlabs/heroicons/blob/v2.2.0/LICENSE).
 ```text
 MIT License
 
@@ -29,4 +29,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
-
