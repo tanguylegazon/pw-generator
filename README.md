@@ -25,7 +25,7 @@ To use this generator, you can either:
 
 ## License and third-party licenses
 
-This project is licensed under the terms of the MIT License. For more information, see the [LICENSE](LICENSE) file.
+This project is licensed under the terms of the Mozilla Public License Version 2.0. For more information, see the [LICENSE](LICENSE) file.
 
 For information on the licenses of third-party components included in this project, see
 the [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md) file.
