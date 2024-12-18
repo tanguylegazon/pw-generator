@@ -4,13 +4,13 @@ However, this project includes third-party components, which are distributed und
 # List of third-party components
 
 - [tanguylegazon's Custom CSS](#tanguylegazons-custom-css)
-- [Heroicons v2.2.0](#heroicons-v220)
+- [Tailwind Labs' Heroicons v2.2.0](#heroicons-v220)
 
 # Licenses
 
-## tanguylegazon's Custom CSS
+## Custom CSS
 
-The project [tanguylegazon's Custom CSS](https://github.com/tanguylegazon/custom-css/) is licensed under the
+The [tanguylegazon's Custom CSS](https://github.com/tanguylegazon/custom-css/) project is licensed under the
 [MIT License](https://github.com/tanguylegazon/custom-css/blob/main/LICENSE).
 
 ```text
@@ -39,8 +39,8 @@ SOFTWARE.
 
 ## Heroicons v2.2.0
 
-The project [Heroicons v2.2.0](https://github.com/tailwindlabs/heroicons/tree/v2.2.0) is licensed under the
-[MIT License](https://github.com/tailwindlabs/heroicons/blob/v2.2.0/LICENSE).
+The [Tailwind Labs' Heroicons v2.2.0](https://github.com/tailwindlabs/heroicons/tree/v2.2.0) project is licensed under
+the [MIT License](https://github.com/tailwindlabs/heroicons/blob/v2.2.0/LICENSE).
 
 ```text
 MIT License
