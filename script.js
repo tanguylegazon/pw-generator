@@ -196,7 +196,7 @@ function updateEntropy() {
 function updateEntropyBar(entropy) {
     const entropyBar = document.getElementById('entropy-bar');
 
-    if (entropy < 0.35 * entropyForFullBar) {
+    if (entropy < 0.33 * entropyForFullBar) {
         entropyBar.style.backgroundColor = '#ca2121'; // red-650
     } else if (entropy < 0.6 * entropyForFullBar) {
         entropyBar.style.backgroundColor = '#f8af19'; // amber-450
