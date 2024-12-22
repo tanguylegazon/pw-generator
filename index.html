@@ -36,15 +36,15 @@ For more information, see https://github.com/tailwindlabs/heroicons/blob/v2.2.0/
     <div class="password-inputs">
         <div class="password-length">
             <label for="pw-length" class="hidden">Taille du mot de passe</label>
-            <button id="pw-length-decrease" class="small circle">
-                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+            <button id="pw-length-decrease" class="small circle" aria-label="Diminuer la taille du mot de passe">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path d="M3.75 7.25a.75.75 0 0 0 0 1.5h8.5a.75.75 0 0 0 0-1.5h-8.5Z"/>
                 </svg>
             </button>
             <input id="pw-length" type="text" inputmode="numeric" value="16"
                    oninput="this.value = this.value.replace(/\D+/g, '')"/>
-            <button id="pw-length-increase" class="small circle">
-                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+            <button id="pw-length-increase" class="small circle" aria-label="Augmenter la taille du mot de passe">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path d="M8.75 3.75a.75.75 0 0 0-1.5 0v3.5h-3.5a.75.75 0 0 0 0 1.5h3.5v3.5a.75.75 0 0 0 1.5 0v-3.5h3.5a.75.75 0 0 0 0-1.5h-3.5v-3.5Z"/>
                 </svg>
             </button>
@@ -53,8 +53,9 @@ For more information, see https://github.com/tailwindlabs/heroicons/blob/v2.2.0/
         <div class="password-field">
             <label for="pw-field" class="hidden">Mot de passe généré</label>
             <input id="pw-field" type="text" readonly>
-            <button id="pw-refresh" class="secondary">
-                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+            <button id="pw-refresh" class="secondary" aria-label="Générer un nouveau mot de passe"
+                    aria-controls="pw-field">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path d="M13.836 2.477a.75.75 0 0 1 .75.75v3.182a.75.75 0 0 1-.75.75h-3.182a.75.75 0 0 1 0-1.5h1.37l-.84-.841a4.5 4.5 0 0 0-7.08.932.75.75 0 0 1-1.3-.75 6 6 0 0 1 9.44-1.242l.842.84V3.227a.75.75 0 0 1 .75-.75Zm-.911 7.5A.75.75 0 0 1 13.199 11a6 6 0 0 1-9.44 1.241l-.84-.84v1.371a.75.75 0 0 1-1.5 0V9.591a.75.75 0 0 1 .75-.75H5.35a.75.75 0 0 1 0 1.5H3.98l.841.841a4.5 4.5 0 0 0 7.08-.932.75.75 0 0 1 1.025-.273Z"/>
                 </svg>
             </button>
@@ -63,11 +64,11 @@ For more information, see https://github.com/tailwindlabs/heroicons/blob/v2.2.0/
             </div>
         </div>
 
-        <button id="pw-copy" class="circle">
-            <svg class="copied" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+        <button id="pw-copy" class="circle" aria-label="Copier le mot de passe">
+            <svg class="copied" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M12.42 4.13C12.58 4.24 12.7 4.41 12.74 4.6C12.77 4.8 12.73 5.0 12.62 5.17L7.62 12.67C7.56 12.76 7.48 12.84 7.39 12.89C7.29 12.95 7.18 12.99 7.07 13.0C6.96 13.01 6.85 12.99 6.75 12.96C6.64 12.92 6.55 12.86 6.47 12.78L3.47 9.78C3.34 9.64 3.27 9.45 3.27 9.26C3.27 9.06 3.35 8.88 3.49 8.74C3.63 8.6 3.81 8.52 4.01 8.52C4.2 8.52 4.39 8.59 4.53 8.72L6.88 11.07L11.38 4.33C11.49 4.17 11.66 4.05 11.85 4.01C12.05 3.98 12.25 4.02 12.42 4.13Z"/>
             </svg>
-            <svg class="copy" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+            <svg class="copy" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M6 3.5C6 3.1 6.16 2.72 6.44 2.44C6.72 2.16 7.1 2 7.5 2H10.38C10.78 2 11.16 2.16 11.44 2.44L13.56 4.56C13.7 4.7 13.81 4.86 13.89 5.05C13.96 5.23 14 5.42 14 5.62V9.5C14 9.9 13.84 10.28 13.56 10.56C13.28 10.84 12.9 11 12.5 11V8.62C12.5 7.83 12.18 7.06 11.62 6.5L9.5 4.38C8.94 3.82 8.17 3.5 7.38 3.5H6Z"/>
                 <path d="M4.5 5C4.1 5 3.72 5.16 3.44 5.44C3.16 5.72 3 6.1 3 6.5V12.5C3 12.9 3.16 13.28 3.44 13.56C3.72 13.84 4.1 14 4.5 14H9.5C9.9 14 10.28 13.84 10.56 13.56C10.84 13.28 11 12.9 11 12.5V8.62C11 8.22 10.84 7.84 10.56 7.56L8.44 5.44C8.3 5.3 8.13 5.19 7.95 5.11C7.77 5.04 7.58 5 7.38 5H4.5Z"/>
             </svg>
@@ -78,7 +79,7 @@ For more information, see https://github.com/tailwindlabs/heroicons/blob/v2.2.0/
     <div class="password-options">
         <input type="checkbox" id="include-symbols" class="toggle-button-checkbox hidden" checked>
         <label for="include-symbols" class="btn active">
-            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M3 5C3.41 5 3.75 5.34 3.75 5.75V9.75C3.75 10.16 3.41 10.5 3 10.5C2.59 10.5 2.25 10.16 2.25 9.75V5.75C2.25 5.34 2.59 5 3 5Z"/>
                 <path d="M4 13C4 13.55 3.55 14 3 14C2.45 14 2 13.55 2 13C2 12.45 2.45 12 3 12C3.55 12 4 12.45 4 13Z"/>
                 <path fill-rule="evenodd"
@@ -90,7 +91,7 @@ For more information, see https://github.com/tailwindlabs/heroicons/blob/v2.2.0/
 
         <input type="checkbox" id="easy-characters" class="toggle-button-checkbox hidden">
         <label for="easy-characters" class="btn">
-            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path d="M3.79 8.29C3.98 8.11 4.23 8 4.5 8C4.77 8 5.02 8.11 5.21 8.29C5.39 8.48 5.5 8.73 5.5 9C5.5 9.27 5.39 9.52 5.21 9.71C5.02 9.89 4.77 10 4.5 10C4.23 10 3.98 9.89 3.79 9.71C3.61 9.52 3.5 9.27 3.5 9C3.5 8.73 3.61 8.48 3.79 8.29Z"/>
                 <path d="M6.29 8.29C6.48 8.11 6.73 8 7 8C7.27 8 7.52 8.11 7.71 8.29C7.89 8.48 8 8.73 8 9C8 9.27 7.89 9.52 7.71 9.71C7.52 9.89 7.27 10 7 10C6.73 10 6.48 9.89 6.29 9.71C6.11 9.52 6 9.27 6 9C6 8.73 6.11 8.48 6.29 8.29Z"/>
                 <path fill-rule="evenodd"
@@ -102,7 +103,8 @@ For more information, see https://github.com/tailwindlabs/heroicons/blob/v2.2.0/
     </div>
 </div>
 
-<a class="github-banner" href="https://github.com/tanguylegazon/pw-generator" target="_blank">
+<a class="github-banner" href="https://github.com/tanguylegazon/pw-generator" target="_blank"
+   aria-label="Voir le code source sur GitHub">
     <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
         <path d="M32.03 0.64C14.32 0.64 0 15.04 0 32.86C0 47.1 9.17 59.16 21.9 63.43C23.49 63.75 24.07 62.73 24.07 61.88C24.07 61.13 24.02 58.57 24.02 55.91C15.11 57.83 13.26 52.06 13.26 52.06C11.82 48.33 9.7 47.37 9.7 47.37C6.79 45.4 9.92 45.4 9.92 45.4C13.15 45.61 14.85 48.7 14.85 48.7C17.71 53.61 22.32 52.22 24.18 51.37C24.44 49.29 25.29 47.85 26.19 47.05C19.09 46.3 11.61 43.53 11.61 31.15C11.61 27.63 12.88 24.75 14.9 22.51C14.58 21.71 13.47 18.4 15.22 13.98C15.22 13.98 17.92 13.12 24.02 17.28C26.63 16.58 29.32 16.22 32.03 16.22C34.73 16.22 37.49 16.59 40.03 17.28C46.13 13.12 48.83 13.98 48.83 13.98C50.59 18.4 49.47 21.71 49.15 22.51C51.22 24.75 52.44 27.63 52.44 31.15C52.44 43.53 44.96 46.25 37.81 47.05C38.97 48.06 39.98 49.98 39.98 53.02C39.98 57.35 39.93 60.81 39.93 61.88C39.93 62.73 40.51 63.75 42.1 63.43C54.83 59.16 64 47.1 64 32.86C64.05 15.04 49.68 0.64 32.03 0.64Z"/>
     </svg>
