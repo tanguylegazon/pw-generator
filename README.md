@@ -14,7 +14,8 @@ mind, all the code is run client-side, no data is stored or sent to a server.
 
 - `index.html`: The main project page.
 - `style.css`: CSS styles for layout and visual elements.
-- `script.js`: JavaScript script for application logic.
+- `script.js`: Main JavaScript script for UI interactions and display.
+- `password.js`: JavaScript script for password generation.
 
 ## Usage
 
@@ -24,6 +25,9 @@ To use this generator, you can either:
 
 1. Access the live version at [tanguy-portfolio.com/password](https://tanguy-portfolio.com/password).
 2. Clone this repository and open `index.html` in your web browser.
+
+> **Note:** The `password.js` file can be used as a standalone script to generate secure passwords in other project
+> environments.
 
 ## License and third-party licenses
 
