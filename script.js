@@ -56,38 +56,28 @@ let charset = "";
 let charsetLength = 0;
 const ambiguousCharset = "012CcIilOoXxZz!\"$&'+,/:;@[\\]^`{|}~";
 
-const digits = "0123456789";
-const lowerCase = "abcdefghijklmnopqrstuvwxyz";
-const upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-const symbols = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-
-let digitCharset = digits;
-let lowerCaseCharset = lowerCase;
-let upperCaseCharset = upperCase;
-let symbolCharset = symbols;
+const digitCharset = "0123456789";
+const lowerCaseCharset = "abcdefghijklmnopqrstuvwxyz";
+const upperCaseCharset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const symbolCharset = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 
 /**
  * @function updateCharset
- * @description This function removes ambiguous characters from the character sets if the 'easyCharacters' checkbox is
- * checked. It then concatenates the character sets for digitCharset, lowerCaseCharset, upperCaseCharset, and
- * symbolCharset to form a complete character set.
+ * @description This function updates the character set based on the user's input for character.
  *
  * @returns {string} The complete character set.
  */
 function updateCharset() {
+    charset = includeSymbolsCheckbox.checked ?
+        digitCharset + lowerCaseCharset + upperCaseCharset + symbolCharset :
+        digitCharset + lowerCaseCharset + upperCaseCharset;
+
     if (easyCharacters.checked) {
-        for (let i = 0; i < ambiguousCharset.length; ++i) digitCharset = digitCharset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
-        for (let i = 0; i < ambiguousCharset.length; ++i) lowerCaseCharset = lowerCaseCharset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
-        for (let i = 0; i < ambiguousCharset.length; ++i) upperCaseCharset = upperCaseCharset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
-        for (let i = 0; i < ambiguousCharset.length; ++i) symbolCharset = symbolCharset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
-    } else {
-        digitCharset = digits;
-        lowerCaseCharset = lowerCase;
-        upperCaseCharset = upperCase;
-        symbolCharset = symbols;
+        for (let i = 0; i < ambiguousCharset.length; ++i) {
+            charset = charset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
+        }
     }
 
-    charset = includeSymbolsCheckbox.checked ? digitCharset + lowerCaseCharset + upperCaseCharset + symbolCharset : digitCharset + lowerCaseCharset + upperCaseCharset;
     charsetLength = charset.length;
 }
 

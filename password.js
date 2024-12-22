@@ -97,6 +97,7 @@ function generatePassword(length = 16, charset) {
 
 /**
  * @function calculatePasswordEntropy
+ * @description This function calculates the entropy of a password based on the user's input for length and character set.
  * @param {number} length - The length of the password.
  * @param {string} charset - The character set.
  *
