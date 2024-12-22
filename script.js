@@ -136,47 +136,19 @@ function textScrambleEffect(text) {
 }
 
 /**
- * @function shuffleString
- * @description This function shuffles the characters in a string in a random order. It uses the Fisher-Yates shuffle algorithm.
- * @param {string} string - The string to be shuffled.
- *
- * @returns {string} The shuffled string.
- */
-
-
-/**
- * @function getSecureRandom
- * @description This function generates a secure random character from the provided character set.
- * If the 'easyCharacters' is checked, it only generates non-confusing characters.
- * @param {string} charset - The character set.
- *
- * @returns {string} A single character randomly selected from the provided character set.
- */
-
-
-/**
- * @function generatePassword
- * @description This function generates a password based on the user's input for length and whether to include symbols.
- * It ensures that the password contains at least one digit, one letter, and one symbol (if symbols are included).
- *
- * @returns {string} The generated password.
- */
-
-
-/**
  * @function updatePassword
  * @description Generate a new password and update the displayed password.
  */
 function updatePassword() {
     if (passwordLengthInput.value >= minPasswordLength && passwordLengthInput.value <= maxPasswordLength) {
         updateCharset();
-        password.value = generatePassword();
+        password.value = generatePassword(Number(passwordLengthInput.value), charset);
         updateEntropy();
     }
 }
 
 function updateEntropy() {
-    const entropy = calculatePasswordEntropy(password.value);
+    const entropy = calculatePasswordEntropy(Number(passwordLengthInput.value), charset);
     updateEntropyBar(entropy);
 }
 
