@@ -17,6 +17,9 @@ mind, all the code is run client-side, no data is stored or sent to a server.
 - `script.js`: Main JavaScript script for UI interactions and display.
 - `password.js`: JavaScript script for password generation.
 
+> **Note:** The `password.js` file can be used as a standalone script to generate secure passwords in other project
+> environments.
+
 ## Usage
 
 ### Setup
@@ -25,9 +28,6 @@ To use this generator, you can either:
 
 1. Access the live version at [tanguy-portfolio.com/password](https://tanguy-portfolio.com/password).
 2. Clone this repository and open `index.html` in your web browser.
-
-> **Note:** The `password.js` file can be used as a standalone script to generate secure passwords in other project
-> environments.
 
 ## License and third-party licenses
 
