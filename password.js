@@ -108,12 +108,6 @@ function calculatePasswordEntropy(length = 0, charset) {
     let upperCaseCharset = getUpperCase(charset);
     let symbolCharset = getSymbols(charset);
 
-    console.log("Charset: " + charset.length);
-    console.log("Digits: " + digitCharset.length);
-    console.log("Lowercase: " + lowerCaseCharset.length);
-    console.log("Uppercase: " + upperCaseCharset.length);
-    console.log("Symbols: " + symbolCharset.length);
-
     let entropy = length * Math.log2(charset.length);
 
     if (symbolCharset.length > 0) {
@@ -137,7 +131,6 @@ function calculatePasswordEntropy(length = 0, charset) {
             - Math.log2(charset.length);
     }
 
-    console.log(entropy);
     return entropy;
 }
 
