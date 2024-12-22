@@ -19,7 +19,7 @@ function shuffleString(string) {
 
     let array = string.split("");
 
-    for (let i = array.length - 1; i > 0; i--) {
+    for (let i = array.length - 1; i > 0; --i) {
         const limit = maxUint32 - (maxUint32 % (i + 1));
         let randomValue = 0;
 
