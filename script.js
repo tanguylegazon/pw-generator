@@ -169,8 +169,8 @@ passwordLengthInput.addEventListener('blur', function () {
     if (this.value === '' || this.value < minPasswordLength) {
         this.value = String(minPasswordLength);
         updatePassword();
-    } else if (this.value > 1024) {
-        this.value = 1024;
+    } else if (this.value > maxPasswordLength) {
+        this.value = maxPasswordLength;
         updatePassword();
     }
 });
