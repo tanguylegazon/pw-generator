@@ -253,12 +253,12 @@ function addIncreaseDecreaseListeners(button, operation, condition) {
     }
 
     button.addEventListener('mousedown', startAction);
-    button.addEventListener('touchstart', startAction);
+    button.addEventListener('touchstart', startAction, {passive: true});
 
     button.addEventListener('mouseup', endAction);
     button.addEventListener('mouseleave', endAction);
-    button.addEventListener('touchend', endAction);
-    button.addEventListener('touchcancel', endAction);
+    button.addEventListener('touchend', endAction, {passive: true});
+    button.addEventListener('touchcancel', endAction, {passive: true});
 }
 
 addIncreaseDecreaseListeners(increaseButton, function () {
