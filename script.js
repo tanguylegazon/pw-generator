@@ -54,12 +54,12 @@ if (localStorage.getItem('easyCharacters') === null) {
  ***********/
 let charset = "";
 let charsetLength = 0;
-const ambiguousCharset = "012CcIilOoXxZz!\"$&'+,/:;@[\\]^`{|}~";
 
 const digitCharset = "0123456789";
 const lowerCaseCharset = "abcdefghijklmnopqrstuvwxyz";
 const upperCaseCharset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const symbolCharset = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+const ambiguousCharset = "012CcIilOoXxZz!\"$&'+,/:;@[\\]^`{|}~";
 
 /**
  * @function updateCharset
