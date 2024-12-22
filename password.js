@@ -77,14 +77,15 @@ function generatePassword(length = 16, charset) {
     if (symbolCharset.length > 0) {
         result += getRandomCharacter(symbolCharset);
     }
-
-    if (length >= 4 || length >= 3 && digitCharset.length === 0) {
+    if (length >= 4 || length >= 3 && symbolCharset.length === 0) {
         result += getRandomCharacter(digitCharset);
         result += getRandomCharacter(lowerCaseCharset);
         result += getRandomCharacter(upperCaseCharset);
-    } else if (length >= 3 && digitCharset.length > 0) {
+    } else if (length === 3 && symbolCharset.length > 0) {
         result += getRandomCharacter(digitCharset);
         result += getRandomCharacter(lowerCaseCharset + upperCaseCharset);
+    } else if (length === 2 && symbolCharset.length > 0) {
+        result += getRandomCharacter(digitCharset + lowerCaseCharset + upperCaseCharset);
     }
 
     for (let i = result.length; i < length; ++i) {
@@ -107,25 +108,36 @@ function calculatePasswordEntropy(length = 0, charset) {
     let upperCaseCharset = getUpperCase(charset);
     let symbolCharset = getSymbols(charset);
 
+    console.log("Charset: " + charset.length);
+    console.log("Digits: " + digitCharset.length);
+    console.log("Lowercase: " + lowerCaseCharset.length);
+    console.log("Uppercase: " + upperCaseCharset.length);
+    console.log("Symbols: " + symbolCharset.length);
+
     let entropy = length * Math.log2(charset.length);
 
     if (symbolCharset.length > 0) {
         entropy += Math.log2(symbolCharset.length) - Math.log2(charset.length);
     }
 
-    if (length >= 4 || length >= 3 && digitCharset.length === 0) {
+    if (length >= 4 || length >= 3 && symbolCharset.length === 0) {
         entropy +=
             Math.log2(digitCharset.length)
             + Math.log2(lowerCaseCharset.length)
             + Math.log2(upperCaseCharset.length)
             - 3 * Math.log2(charset.length);
-    } else if (length >= 3 && digitCharset.length > 0) {
+    } else if (length === 3 && symbolCharset.length > 0) {
         entropy +=
             Math.log2(digitCharset.length)
             + Math.log2(lowerCaseCharset.length + upperCaseCharset.length)
             - 2 * Math.log2(charset.length);
+    } else if (length === 2 && symbolCharset.length > 0) {
+        entropy +=
+            Math.log2(digitCharset.length + lowerCaseCharset.length + upperCaseCharset.length)
+            - Math.log2(charset.length);
     }
 
+    console.log(entropy);
     return entropy;
 }
 
@@ -185,4 +197,4 @@ function getSymbols(charset) {
     return [...new Set(charset.match(/[^a-zA-Z0-9]/g))].sort().join('');
 }
 
-export { generatePassword, calculatePasswordEntropy };
+export {generatePassword, calculatePasswordEntropy};
