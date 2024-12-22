@@ -3,11 +3,19 @@
  * If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
+import {generatePassword, calculatePasswordEntropy} from './password.js';
+
 /**
  * @constant {number} minPasswordLength
  * @description The minimum length that a password can be.
  */
 const minPasswordLength = 1;
+
+/**
+ * @constant {number} maxPasswordLength
+ * @description The maximum length that a password can be.
+ */
+const maxPasswordLength = 1024;
 
 /**
  * @constant {number} entropyForFullBar
@@ -84,33 +92,9 @@ function updateCharset() {
 }
 
 
-/******************
- * Password logic *
- ******************/
-function calculatePasswordEntropy(length) {
-    if (length === 0 || charsetLength === 0) return 0;
-    if (length >= 4) {
-        let entropy = 0;
-
-        entropy =
-            (length - (includeSymbolsCheckbox.checked ? 4 : 3)) * Math.log2(charsetLength)
-            + Math.log2(digitCharset.length)
-            + Math.log2(lowerCaseCharset.length)
-            + Math.log2(upperCaseCharset.length)
-            + (includeSymbolsCheckbox.checked ? Math.log2(symbolCharset.length) : 0);
-
-         if (includeSymbolsCheckbox.checked) {
-            entropy += Math.log2(symbolCharset.length);
-        } else {
-            entropy += Math.log2(charsetLength);
-        }
-
-        return Math.round(entropy);
-    } else {
-        return Math.round(length * Math.log2(charsetLength));
-    }
-}
-
+/************
+ * Password *
+ ************/
 /**
  * @function textScrambleEffect
  * @description This function creates a scramble effect on the text. It gradually reveals the actual text by randomly
@@ -152,92 +136,18 @@ function textScrambleEffect(text) {
 }
 
 /**
- * @function shuffleString
- * @description This function shuffles the characters in a string in a random order. It uses the Fisher-Yates shuffle algorithm.
- * @param {string} string - The string to be shuffled.
- *
- * @returns {string} The shuffled string.
- */
-function shuffleString(string) {
-    let array = string.split("");
-    let oldElement;
-
-    for (let i = array.length - 1; i >= 0; --i) {
-        let randomValue = 0;
-
-        do {
-            randomValue = window.crypto.getRandomValues(new Uint16Array(1))[0];
-        } while (randomValue >= Math.floor((2 ** 16 - 1) / array.length) * array.length);
-
-        oldElement = array[i];
-        array[i] = array[randomValue];
-        array[randomValue] = oldElement;
-    }
-
-    return array.join("");
-}
-
-/**
- * @function getSecureRandom
- * @description This function generates a secure random character from the provided character set.
- * If the 'easyCharacters' is checked, it only generates non-confusing characters.
- * @param {string} charset - The character set.
- *
- * @returns {string} A single character randomly selected from the provided character set.
- */
-function getSecureRandom(charset) {
-    let randomValue, character;
-
-    do {
-        do {
-            randomValue = window.crypto.getRandomValues(new Uint8Array(1))[0];
-        } while (randomValue >= Math.floor(256 / charset.length) * charset.length);
-        character = charset.charAt(randomValue % charset.length);
-    } while (easyCharacters.checked && ambiguousCharset.includes(character));
-
-    return character;
-}
-
-/**
- * @function generatePassword
- * @description This function generates a password based on the user's input for length and whether to include symbols.
- * It ensures that the password contains at least one digit, one letter, and one symbol (if symbols are included).
- *
- * @returns {string} The generated password.
- */
-function generatePassword() {
-    const length = passwordLengthInput.value;
-    let result = "";
-
-    updateCharset();
-
-    if (length >= 4) {
-        result += getSecureRandom(digitCharset);
-        result += getSecureRandom(lowerCaseCharset);
-        result += getSecureRandom(upperCaseCharset);
-        if (includeSymbolsCheckbox.checked) {
-            result += getSecureRandom(symbolCharset);
-        }
-    }
-
-    for (let i = result.length; i < length; ++i) {
-        result += getSecureRandom(charset);
-    }
-
-    const entropy = calculatePasswordEntropy(length, charsetLength);
-    updateEntropyBar(entropy);
-
-    textScrambleEffect(shuffleString(result));
-    return shuffleString(result);
-}
-
-/**
  * @function updatePassword
- * @description Updates the displayed password on the webpage by generating a new password and setting it as the text content of the 'password' element.
+ * @description Generate a new password and update the displayed password.
  */
 function updatePassword() {
-    if (passwordLengthInput.value <= 1024) password.value = generatePassword();
+    if (passwordLengthInput.value >= minPasswordLength && passwordLengthInput.value <= maxPasswordLength) {
+        updateCharset();
+        textScrambleEffect(generatePassword(Number(passwordLengthInput.value), charset));
+        updateEntropy();
+    }
 }
+
+updatePassword();
 
 let lastValidValue = Number(passwordLengthInput.value);
 let timeoutId = null;
@@ -265,6 +175,19 @@ passwordLengthInput.addEventListener('blur', function () {
     }
 });
 
+
+/***********
+ * Entropy *
+ ***********/
+/**
+ * @function updateEntropy
+ * @description Update the password entropy bar based on the current password.
+ */
+function updateEntropy() {
+    const entropy = calculatePasswordEntropy(Number(passwordLengthInput.value), charset);
+    updateEntropyBar(entropy);
+}
+
 /**
  * @function updateEntropyBar
  * @description Updates the color and width of the entropy bar based on the entropy value. The bar width is maxed out at 128 bits of entropy.
@@ -285,8 +208,6 @@ function updateEntropyBar(entropy) {
 
     entropyBar.style.width = Math.min(entropy / entropyForFullBar * 100, 100) + '%';
 }
-
-updatePassword();
 
 
 /*******************************
