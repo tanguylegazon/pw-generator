@@ -74,13 +74,17 @@ function generatePassword(length = 16, charset) {
     let upperCaseCharset = getUpperCase(charset);
     let symbolCharset = getSymbols(charset);
 
-    if (length >= 3) {
+    if (symbolCharset.length > 0) {
+        result += getRandomCharacter(symbolCharset);
+    }
+
+    if (length >= 4 || length >= 3 && digitCharset.length === 0) {
         result += getRandomCharacter(digitCharset);
         result += getRandomCharacter(lowerCaseCharset);
         result += getRandomCharacter(upperCaseCharset);
-    }
-    if (length >= 4 && symbolCharset.length > 0) {
-        result += getRandomCharacter(symbolCharset);
+    } else if (length >= 3 && digitCharset.length > 0) {
+        result += getRandomCharacter(digitCharset);
+        result += getRandomCharacter(lowerCaseCharset + upperCaseCharset);
     }
 
     for (let i = result.length; i < length; ++i) {
@@ -88,6 +92,41 @@ function generatePassword(length = 16, charset) {
     }
 
     return shuffleString(result);
+}
+
+function calculatePasswordEntropy(length = 0, charset) {
+    if (typeof length !== "number") throw new TypeError("Password length must be a number.");
+    if (length !== Math.floor(length)) throw new TypeError("Password length must be an integer.");
+    if (typeof charset !== "string") throw new TypeError("Character set must be a string.");
+    if (charset.length === 0) throw new RangeError("Character set must not be empty.");
+
+    if (length < 1) return 0;
+
+    let digitCharset = getDigits(charset);
+    let lowerCaseCharset = getLowerCase(charset);
+    let upperCaseCharset = getUpperCase(charset);
+    let symbolCharset = getSymbols(charset);
+
+    let entropy = length * Math.log2(charset.length);
+
+    if (symbolCharset.length > 0) {
+        entropy += Math.log2(symbolCharset.length) - Math.log2(charset.length);
+    }
+
+    if (length >= 4 || length >= 3 && digitCharset.length === 0) {
+        entropy +=
+            Math.log2(digitCharset.length)
+            + Math.log2(lowerCaseCharset.length)
+            + Math.log2(upperCaseCharset.length)
+            - 3 * Math.log2(charset.length);
+    } else if (length >= 3 && digitCharset.length > 0) {
+        entropy +=
+            Math.log2(digitCharset.length)
+            + Math.log2(lowerCaseCharset.length + upperCaseCharset.length)
+            - 2 * Math.log2(charset.length);
+    }
+
+    return entropy;
 }
 
 /**
@@ -145,3 +184,5 @@ function getSymbols(charset) {
 
     return [...new Set(charset.match(/[^a-zA-Z0-9]/g))].sort().join('');
 }
+
+export { generatePassword, calculatePasswordEntropy };
