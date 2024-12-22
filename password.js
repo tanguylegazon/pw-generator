@@ -46,7 +46,7 @@ function getRandomCharacter(charset) {
     if (typeof charset !== "string") throw new TypeError("Character set must be a string.");
     if (charset.length === 0) throw new RangeError("Character set must not be empty.");
 
-    let randomValue, character;
+    let randomValue = 0;
 
     do {
         randomValue = window.crypto.getRandomValues(new Uint8Array(1))[0];
