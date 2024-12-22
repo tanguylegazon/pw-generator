@@ -95,6 +95,13 @@ function generatePassword(length = 16, charset) {
     return shuffleString(result);
 }
 
+/**
+ * @function calculatePasswordEntropy
+ * @param {number} length - The length of the password.
+ * @param {string} charset - The character set.
+ *
+ * @returns {number} The entropy of the password.
+ */
 function calculatePasswordEntropy(length = 0, charset) {
     if (typeof length !== "number") throw new TypeError("Password length must be a number.");
     if (length !== Math.floor(length)) throw new TypeError("Password length must be an integer.");

@@ -3,7 +3,7 @@
  * If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import { generatePassword, calculatePasswordEntropy } from './password.js';
+import {generatePassword, calculatePasswordEntropy} from './password.js';
 
 /**
  * @constant {number} minPasswordLength
@@ -92,9 +92,9 @@ function updateCharset() {
 }
 
 
-/******************
- * Password logic *
- ******************/
+/************
+ * Password *
+ ************/
 /**
  * @function textScrambleEffect
  * @description This function creates a scramble effect on the text. It gradually reveals the actual text by randomly
@@ -142,15 +142,12 @@ function textScrambleEffect(text) {
 function updatePassword() {
     if (passwordLengthInput.value >= minPasswordLength && passwordLengthInput.value <= maxPasswordLength) {
         updateCharset();
-        password.value = generatePassword(Number(passwordLengthInput.value), charset);
+        textScrambleEffect(generatePassword(Number(passwordLengthInput.value), charset));
         updateEntropy();
     }
 }
 
-function updateEntropy() {
-    const entropy = calculatePasswordEntropy(Number(passwordLengthInput.value), charset);
-    updateEntropyBar(entropy);
-}
+updatePassword();
 
 let lastValidValue = Number(passwordLengthInput.value);
 let timeoutId = null;
@@ -178,6 +175,19 @@ passwordLengthInput.addEventListener('blur', function () {
     }
 });
 
+
+/***********
+ * Entropy *
+ ***********/
+/**
+ * @function updateEntropy
+ * @description Update the password entropy bar based on the current password.
+ */
+function updateEntropy() {
+    const entropy = calculatePasswordEntropy(Number(passwordLengthInput.value), charset);
+    updateEntropyBar(entropy);
+}
+
 /**
  * @function updateEntropyBar
  * @description Updates the color and width of the entropy bar based on the entropy value. The bar width is maxed out at 128 bits of entropy.
@@ -198,8 +208,6 @@ function updateEntropyBar(entropy) {
 
     entropyBar.style.width = Math.min(entropy / entropyForFullBar * 100, 100) + '%';
 }
-
-updatePassword();
 
 
 /*******************************
