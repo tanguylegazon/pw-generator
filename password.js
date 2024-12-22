@@ -47,7 +47,7 @@ function getRandomCharacter(charset) {
     if (charset.length === 0) throw new RangeError("Character set must not be empty.");
 
     let randomValue = 0;
-
+// Temporary edit for GitHub Actions deployment
     do {
         randomValue = window.crypto.getRandomValues(new Uint8Array(1))[0];
     } while (randomValue >= 256 / charset.length * charset.length);
