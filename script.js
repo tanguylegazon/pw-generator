@@ -68,9 +68,10 @@ const ambiguousCharset = "012CcIilOoXxZz!\"$&'+,/:;@[\\]^`{|}~";
  * @returns {string} The complete character set.
  */
 function updateCharset() {
-    charset = includeSymbolsCheckbox.checked ?
-        digitCharset + lowerCaseCharset + upperCaseCharset + symbolCharset :
-        digitCharset + lowerCaseCharset + upperCaseCharset;
+    charset =
+        includeSymbolsCheckbox.checked ?
+            digitCharset + lowerCaseCharset + upperCaseCharset + symbolCharset :
+            digitCharset + lowerCaseCharset + upperCaseCharset;
 
     if (easyCharacters.checked) {
         for (let i = 0; i < ambiguousCharset.length; ++i) {
@@ -98,7 +99,8 @@ function textScrambleEffect(text) {
 
     let durations = [];
     for (let i = 0; i < text.length; ++i) {
-        durations[i] = baseDuration * ((1 - durationVariance) + 2 * durationVariance * Math.random());
+        durations[i] =
+            baseDuration * ((1 - durationVariance) + 2 * durationVariance * Math.random());
     }
 
     let counters = new Array(text.length).fill(0);
@@ -130,7 +132,8 @@ function textScrambleEffect(text) {
  * @description Generate a new password and update the displayed password.
  */
 function updatePassword() {
-    if (passwordLengthInput.value >= minPasswordLength && passwordLengthInput.value <= maxPasswordLength) {
+    if (passwordLengthInput.value >= minPasswordLength &&
+        passwordLengthInput.value <= maxPasswordLength) {
         updateCharset();
         textScrambleEffect(generatePassword(Number(passwordLengthInput.value), charset));
         updateEntropy();
@@ -180,7 +183,8 @@ function updateEntropy() {
 
 /**
  * @function updateEntropyBar
- * @description Updates the color and width of the entropy bar based on the entropy value. The bar width is maxed out at 128 bits of entropy.
+ * @description Updates the color and width of the entropy bar based on the entropy value. The bar width is maxed out
+ * at 128 bits of entropy.
  * @param {number} entropy - The entropy value of the password.
  */
 function updateEntropyBar(entropy) {
@@ -338,5 +342,7 @@ const refreshButtonSVG = refreshButton.querySelector('svg');
 refreshButton.onclick = () => {
     clearTimeout(timeoutId);
     refreshButtonSVG.classList.add('rotate');
-    timeoutId = setTimeout(() => refreshButtonSVG.classList.remove('rotate'), 750);
+    timeoutId = setTimeout(() =>
+        refreshButtonSVG.classList.remove('rotate'), 750
+    );
 };

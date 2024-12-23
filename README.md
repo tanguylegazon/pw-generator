@@ -1,7 +1,7 @@
 # Password Generator
 
-A simple password generator built using HTML, CSS, and JavaScript. This project is designed with privacy and security in
-mind, all the code is run client-side, no data is stored or sent to a server.
+A simple password generator built using HTML, CSS, and JavaScript. This project is designed with privacy and security
+in mind, all the code is run client-side, no data is stored or sent to a server.
 
 ## Features
 
@@ -34,8 +34,8 @@ To use this generator, you can either:
 This project is licensed under the terms of the Mozilla Public License Version 2.0. See the [LICENSE](LICENSE) file for
 details.
 
-This project includes third-party components distributed under their own respective licenses. See
-the [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md) file for details.
+This project includes third-party components distributed under their own respective licenses. See the
+[THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md) file for details.
 
 ---
 

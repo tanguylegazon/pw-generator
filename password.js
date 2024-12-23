@@ -5,7 +5,8 @@
 
 /**
  * @function shuffleString
- * @description This function shuffles the characters in a string in a random order. It uses the Fisher-Yates shuffle algorithm.
+ * @description This function shuffles the characters in a string in a random order. It uses the Fisher-Yates shuffle
+ * algorithm.
  * @param {string} string - The string to be shuffled.
  *
  * @returns {string} The shuffled string.
@@ -56,8 +57,8 @@ function getRandomCharacter(charset) {
 
 /**
  * @function generatePassword
- * @description This function generates a password based on the user's input for length and whether to include symbols.
- * It ensures that the password contains at least one digit, one letter, and one symbol (if symbols are included).
+ * @description This function generates a password based on the user's input for length and options. It ensures at
+ * least one digit, one letter, and one symbol (if symbols are included).
  *
  * @returns {string} The generated password.
  */
@@ -78,12 +79,12 @@ function generatePassword(length = 16, charset) {
         result += getRandomCharacter(symbolCharset);
     }
     if (length >= 4 || length >= 3 && symbolCharset.length === 0) {
-        result += getRandomCharacter(digitCharset);
-        result += getRandomCharacter(lowerCaseCharset);
-        result += getRandomCharacter(upperCaseCharset);
+        result +=
+            getRandomCharacter(digitCharset)
+            + getRandomCharacter(lowerCaseCharset)
+            + getRandomCharacter(upperCaseCharset);
     } else if (length === 3 && symbolCharset.length > 0) {
-        result += getRandomCharacter(digitCharset);
-        result += getRandomCharacter(lowerCaseCharset + upperCaseCharset);
+        result += getRandomCharacter(digitCharset) + getRandomCharacter(lowerCaseCharset + upperCaseCharset);
     } else if (length === 2 && symbolCharset.length > 0) {
         result += getRandomCharacter(digitCharset + lowerCaseCharset + upperCaseCharset);
     }
@@ -97,7 +98,8 @@ function generatePassword(length = 16, charset) {
 
 /**
  * @function calculatePasswordEntropy
- * @description This function calculates the entropy of a password based on the user's input for length and character set.
+ * @description This function calculates the entropy of a password based on the user's input for length and character
+ * set.
  * @param {number} length - The length of the password.
  * @param {string} charset - The character set.
  *
