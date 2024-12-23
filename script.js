@@ -75,7 +75,8 @@ function updateCharset() {
 
     if (easyCharacters.checked) {
         for (let i = 0; i < ambiguousCharset.length; ++i) {
-            charset = charset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
+            charset =
+                charset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
         }
     }
 
