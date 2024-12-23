@@ -10,7 +10,7 @@ However, this project includes third-party components, which are distributed und
 
 ## Custom CSS
 
-The [tanguylegazon's Custom CSS](https://github.com/tanguylegazon/custom-css) project is licensed under the
+The [tanguylegazon's Custom CSS](https://github.com/tanguylegazon/custom-css) project is licensed under the terms of the
 [MIT License](https://github.com/tanguylegazon/custom-css/blob/main/LICENSE).
 
 ```text
@@ -40,7 +40,7 @@ SOFTWARE.
 ## Heroicons v2.2.0
 
 The [Tailwind Labs' Heroicons v2.2.0](https://github.com/tailwindlabs/heroicons/tree/v2.2.0) project is licensed under
-the [MIT License](https://github.com/tailwindlabs/heroicons/blob/v2.2.0/LICENSE).
+the terms of the [MIT License](https://github.com/tailwindlabs/heroicons/blob/v2.2.0/LICENSE).
 
 ```text
 MIT License
