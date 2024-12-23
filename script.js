@@ -104,7 +104,7 @@ function textScrambleEffect(text) {
     let counters = new Array(text.length).fill(0);
     let frameCounts = durations.map(duration => duration / 10);
 
-    let intervalId = setInterval(function () {
+    let intervalId = setInterval(() => {
         let allDone = true;
         for (let i = 0; i < text.length; ++i) {
             if (counters[i] < frameCounts[i]) {
@@ -142,7 +142,7 @@ updatePassword();
 let lastValidValue = Number(passwordLengthInput.value);
 let timeoutId = null;
 
-passwordLengthInput.addEventListener('input', function () {
+passwordLengthInput.addEventListener('input', () => {
     let value = this.value;
     if (value === '') lastValidValue = '';
     value = Number(value);
@@ -155,7 +155,7 @@ passwordLengthInput.addEventListener('input', function () {
     }
 });
 
-passwordLengthInput.addEventListener('blur', function () {
+passwordLengthInput.addEventListener('blur', () => {
     if (this.value === '' || this.value < minPasswordLength) {
         this.value = String(minPasswordLength);
         updatePassword();
@@ -242,7 +242,7 @@ function addIncreaseDecreaseListeners(button, operation) {
     let intervalId = null;
 
     function startAction() {
-        timeoutId = setTimeout(function () {
+        timeoutId = setTimeout(() => {
             intervalId = setInterval(operation, 20);
         }, 900);
     }
@@ -250,6 +250,7 @@ function addIncreaseDecreaseListeners(button, operation) {
     function endAction() {
         clearInterval(intervalId);
         clearTimeout(timeoutId);
+        if (password.value.length !== Number(passwordLengthInput.value)) updatePassword();
     }
 
     button.addEventListener('mousedown', startAction);
@@ -273,7 +274,7 @@ addIncreaseDecreaseListeners(decreaseButton, decreasePasswordLength);
  ****************************/
 const copyButton = document.getElementById('pw-copy');
 
-copyButton.addEventListener('click', function () {
+copyButton.addEventListener('click', () => {
     const passwordText = password.value;
     password.focus();
     password.select();
@@ -304,37 +305,37 @@ copyButton.addEventListener('click', function () {
  * Other actions *
  *****************/
 if ('maxTouchPoints' in navigator && navigator.maxTouchPoints > 0) {
-    passwordLengthInput.addEventListener('click', function () {
+    passwordLengthInput.addEventListener('click', () => {
         this.select();
     });
 
-    password.addEventListener('click', function () {
+    password.addEventListener('click', () => {
         this.select();
     });
 } else {
-    passwordLengthInput.addEventListener('focus', function () {
+    passwordLengthInput.addEventListener('focus', () => {
         this.select();
     });
 
-    password.addEventListener('focus', function () {
+    password.addEventListener('focus', () => {
         this.select();
     });
 }
 
 refreshButton.addEventListener('click', updatePassword);
 
-includeSymbolsCheckbox.addEventListener('click', function () {
+includeSymbolsCheckbox.addEventListener('click', () => {
     localStorage.setItem('includeSymbols', includeSymbolsCheckbox.checked);
     updatePassword();
 });
 
-easyCharacters.addEventListener('click', function () {
+easyCharacters.addEventListener('click', () => {
     localStorage.setItem('easyCharacters', easyCharacters.checked);
     updatePassword();
 });
 
 const refreshButtonSVG = refreshButton.querySelector('svg');
-refreshButton.onclick = function () {
+refreshButton.onclick = () => {
     clearTimeout(timeoutId);
     refreshButtonSVG.classList.add('rotate');
     timeoutId = setTimeout(() => refreshButtonSVG.classList.remove('rotate'), 750);
