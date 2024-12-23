@@ -206,44 +206,44 @@ function updateEntropyBar(entropy) {
 const decreaseButton = document.getElementById('pw-length-decrease');
 const increaseButton = document.getElementById('pw-length-increase');
 
-increaseButton.addEventListener('click', function () {
-    let value = Number(passwordLengthInput.value);
-    if (value < 1024) {
-        ++value;
-        passwordLengthInput.value = String(value);
+/**
+ * @function increasePasswordLength
+ * @description Increase the password length by one.
+ */
+function increasePasswordLength() {
+    if (passwordLengthInput.value < maxPasswordLength) {
+        let value = Number(passwordLengthInput.value);
+        passwordLengthInput.value = String(++value);
         updatePassword();
     }
-});
+}
 
-decreaseButton.addEventListener('click', function () {
-    let value = Number(passwordLengthInput.value);
-    if (value > minPasswordLength) {
-        --value;
-        passwordLengthInput.value = String(value);
-        updatePassword();
+/**
+ * @function decreasePasswordLength
+ * @description Decrease the password length by one.
+ */
+function decreasePasswordLength() {
+    if (passwordLengthInput.value > minPasswordLength) {
+        let value = Number(passwordLengthInput.value);
+        passwordLengthInput.value = String(--value);
+        updatePassword()
     }
-});
+}
 
 /**
  * @function addIncreaseDecreaseListeners
- * @description This function adds event listeners to the increase or decrease button with a delay and repetition when the button is held down.
+ * @description This function adds event listeners to the increase or decrease button with a delay and repetition when
+ * the button is held down.
  * @param {HTMLElement} button - The button which is held down.
  * @param {Function} operation - The operation to be performed when the button is pressed.
- * @param {Function} condition - The condition that must be met for the operation to be performed.
  */
-function addIncreaseDecreaseListeners(button, operation, condition) {
+function addIncreaseDecreaseListeners(button, operation) {
     let timeoutId = null;
     let intervalId = null;
 
     function startAction() {
         timeoutId = setTimeout(function () {
-            intervalId = setInterval(function () {
-                let value = Number(passwordLengthInput.value);
-                if (condition(value)) {
-                    operation();
-                    updatePassword();
-                }
-            }, 20);
+            intervalId = setInterval(operation, 20);
         }, 900);
     }
 
@@ -261,23 +261,11 @@ function addIncreaseDecreaseListeners(button, operation, condition) {
     button.addEventListener('touchcancel', endAction, {passive: true});
 }
 
-addIncreaseDecreaseListeners(increaseButton, function () {
-    let value = Number(passwordLengthInput.value);
-    if (value < 1024) {
-        passwordLengthInput.value = String(++value);
-    }
-}, function (value) {
-    return value < 1024;
-});
+increaseButton.addEventListener('click', increasePasswordLength);
+decreaseButton.addEventListener('click', decreasePasswordLength);
 
-addIncreaseDecreaseListeners(decreaseButton, function () {
-    let value = Number(passwordLengthInput.value);
-    if (value > minPasswordLength) {
-        passwordLengthInput.value = String(--value);
-    }
-}, function (value) {
-    return value > minPasswordLength;
-});
+addIncreaseDecreaseListeners(increaseButton, increasePasswordLength);
+addIncreaseDecreaseListeners(decreaseButton, decreasePasswordLength);
 
 
 /****************************
