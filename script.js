@@ -186,8 +186,6 @@ passwordLengthInput.addEventListener('keydown', function (event) {
     }
 });
 
-
-
 passwordLengthInput.addEventListener('blur', function () {
     if (this.value === '' || Number(this.value) < minPasswordLength) {
         this.value = String(minPasswordLength);
