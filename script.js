@@ -133,8 +133,7 @@ function textScrambleEffect(text) {
  * @description Generate a new password and update the displayed password.
  */
 function updatePassword() {
-    if (passwordLengthInput.value >= minPasswordLength &&
-        passwordLengthInput.value <= maxPasswordLength) {
+    if (passwordLengthInput.value >= minPasswordLength && passwordLengthInput.value <= maxPasswordLength) {
         updateCharset();
         textScrambleEffect(generatePassword(Number(passwordLengthInput.value), charset));
         updateEntropy();
@@ -146,7 +145,7 @@ updatePassword();
 let lastValidValue = Number(passwordLengthInput.value);
 let timeoutId = null;
 
-passwordLengthInput.addEventListener('input', () => {
+passwordLengthInput.addEventListener('input', function () {
     let value = this.value;
     if (value === '') lastValidValue = '';
     value = Number(value);
@@ -159,7 +158,7 @@ passwordLengthInput.addEventListener('input', () => {
     }
 });
 
-passwordLengthInput.addEventListener('blur', () => {
+passwordLengthInput.addEventListener('blur', function () {
     if (this.value === '' || this.value < minPasswordLength) {
         this.value = String(minPasswordLength);
         updatePassword();
@@ -310,19 +309,19 @@ copyButton.addEventListener('click', () => {
  * Other actions *
  *****************/
 if ('maxTouchPoints' in navigator && navigator.maxTouchPoints > 0) {
-    passwordLengthInput.addEventListener('click', () => {
+    passwordLengthInput.addEventListener('click', function () {
         this.select();
     });
 
-    password.addEventListener('click', () => {
+    password.addEventListener('click', function () {
         this.select();
     });
 } else {
-    passwordLengthInput.addEventListener('focus', () => {
+    passwordLengthInput.addEventListener('focus', function () {
         this.select();
     });
 
-    password.addEventListener('focus', () => {
+    password.addEventListener('focus', function () {
         this.select();
     });
 }
