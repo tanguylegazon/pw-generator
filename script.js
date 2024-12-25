@@ -143,30 +143,58 @@ function updatePassword() {
 updatePassword();
 
 let lastValidValue = Number(passwordLengthInput.value);
-let timeoutId = null;
+let clipboardTimeoutId = null;
+let inputRefreshTimeoutId = null;
 
-passwordLengthInput.addEventListener('input', function () {
-    let value = this.value;
-    if (value === '') lastValidValue = '';
-    value = Number(value);
-    if (!isNaN(value) && value !== lastValidValue) {
-        lastValidValue = value;
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(updatePassword, 650);
-    } else {
-        this.value = lastValidValue;
+passwordLengthInput.addEventListener('beforeinput', function (event) {
+    if (event.data && /\D/.test(event.data)) {
+        event.preventDefault();
     }
 });
 
-passwordLengthInput.addEventListener('blur', function () {
-    passwordLengthInput.removeEventListener('keydown', increaseDecreaseArrowKeys);
-    if (this.value === '' || this.value < minPasswordLength) {
-        this.value = String(minPasswordLength);
+passwordLengthInput.addEventListener('input', function () {
+    clearTimeout(inputRefreshTimeoutId);
+    const value = this.value;
+
+    if (value === '') {
+        lastValidValue = '';
+    } else if (!isNaN(value) && Number(value) !== lastValidValue) {
+        lastValidValue = Number(value);
+    } else {
+        this.value = String(lastValidValue);
+    }
+
+    inputRefreshTimeoutId = setTimeout(() => {
+        if (this.value === '' || Number(this.value) < minPasswordLength) {
+            this.value = String(minPasswordLength);
+        } else if (Number(this.value) > maxPasswordLength) {
+            this.value = maxPasswordLength;
+        }
         updatePassword();
-    } else if (this.value > maxPasswordLength) {
-        this.value = maxPasswordLength;
+    }, 1500);
+});
+
+passwordLengthInput.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+        clearTimeout(inputRefreshTimeoutId);
+        if (this.value === '' || Number(this.value) < minPasswordLength) {
+            this.value = String(minPasswordLength);
+        } else if (Number(this.value) > maxPasswordLength) {
+            this.value = maxPasswordLength;
+        }
         updatePassword();
     }
+});
+
+
+
+passwordLengthInput.addEventListener('blur', function () {
+    if (this.value === '' || Number(this.value) < minPasswordLength) {
+        this.value = String(minPasswordLength);
+    } else if (Number(this.value) > maxPasswordLength) {
+        this.value = maxPasswordLength;
+    }
+    updatePassword();
 });
 
 
@@ -248,7 +276,6 @@ function increaseDecreaseArrowKeys(event) {
         event.preventDefault();
         decreasePasswordLength();
     }
-    passwordLengthInput.select();
 }
 
 /**
@@ -310,11 +337,11 @@ copyButton.addEventListener('click', () => {
 
         copyElements.forEach(element => element.style.opacity = '0');
 
-        if (timeoutId) {
-            clearTimeout(timeoutId);
+        if (clipboardTimeoutId) {
+            clearTimeout(clipboardTimeoutId);
         }
 
-        timeoutId = setTimeout(() => {
+        clipboardTimeoutId = setTimeout(() => {
             copiedElements.forEach(element => element.style.opacity = '0');
             copyElements.forEach(element => element.style.opacity = '1');
         }, 2500);
@@ -358,9 +385,9 @@ easyCharacters.addEventListener('click', () => {
 
 const refreshButtonSVG = refreshButton.querySelector('svg');
 refreshButton.onclick = () => {
-    clearTimeout(timeoutId);
+    clearTimeout(clipboardTimeoutId);
     refreshButtonSVG.classList.add('rotate');
-    timeoutId = setTimeout(() =>
+    clipboardTimeoutId = setTimeout(() =>
         refreshButtonSVG.classList.remove('rotate'), 750
     );
 };
