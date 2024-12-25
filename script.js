@@ -159,6 +159,7 @@ passwordLengthInput.addEventListener('input', function () {
 });
 
 passwordLengthInput.addEventListener('blur', function () {
+    passwordLengthInput.removeEventListener('keydown', increaseDecreaseArrowKeys);
     if (this.value === '' || this.value < minPasswordLength) {
         this.value = String(minPasswordLength);
         updatePassword();
@@ -232,6 +233,22 @@ function decreasePasswordLength() {
         passwordLengthInput.value = String(--value);
         updatePassword()
     }
+}
+
+/**
+ * @function increaseDecreaseArrowKeys
+ * @description This function listens for the arrow up and arrow down keys to increase or decrease the password length.
+ * @param event - The keydown event.
+ */
+function increaseDecreaseArrowKeys(event) {
+    if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        increasePasswordLength();
+    } else if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        decreasePasswordLength();
+    }
+    passwordLengthInput.select();
 }
 
 /**
@@ -319,6 +336,7 @@ if ('maxTouchPoints' in navigator && navigator.maxTouchPoints > 0) {
 } else {
     passwordLengthInput.addEventListener('focus', function () {
         this.select();
+        passwordLengthInput.addEventListener('keydown', increaseDecreaseArrowKeys);
     });
 
     password.addEventListener('focus', function () {
