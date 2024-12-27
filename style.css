@@ -170,16 +170,28 @@ body {
         }
     }
 
-    @media (max-height: 36rem) {
-        .info-banner, .github-banner {
+    @media (max-height: 34rem) {
+        .info-banner {
             display: none;
+        }
+
+        @media (max-height: 28rem) {
+            .github-banner {
+                display: none;
+            }
         }
     }
 }
 
-@media (max-height: 26rem) {
-    .info-banner, .github-banner {
+@media (max-height: 22rem) {
+    .info-banner {
         display: none;
+    }
+
+    @media (max-height: 18rem) {
+        .github-banner {
+            display: none;
+        }
     }
 }
 
