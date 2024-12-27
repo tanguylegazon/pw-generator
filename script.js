@@ -88,6 +88,18 @@ function updateCharset() {
  * Password *
  ************/
 /**
+ * @function updatePassword
+ * @description Generate a new password and update the displayed password.
+ */
+function updatePassword() {
+    if (passwordLengthInput.value >= minPasswordLength && passwordLengthInput.value <= maxPasswordLength) {
+        updateCharset();
+        textScrambleEffect(generatePassword(Number(passwordLengthInput.value), charset));
+        updateEntropy();
+    }
+}
+
+/**
  * @function textScrambleEffect
  * @description This function creates a scramble effect on the text. It gradually reveals the actual text by randomly
  * replacing characters in the text with characters from the character set.
@@ -128,72 +140,7 @@ function textScrambleEffect(text) {
     }, 10);
 }
 
-/**
- * @function updatePassword
- * @description Generate a new password and update the displayed password.
- */
-function updatePassword() {
-    if (passwordLengthInput.value >= minPasswordLength && passwordLengthInput.value <= maxPasswordLength) {
-        updateCharset();
-        textScrambleEffect(generatePassword(Number(passwordLengthInput.value), charset));
-        updateEntropy();
-    }
-}
-
 updatePassword();
-
-let lastValidValue = Number(passwordLengthInput.value);
-let clipboardTimeoutId = null;
-let inputRefreshTimeoutId = null;
-
-passwordLengthInput.addEventListener('beforeinput', function (event) {
-    if (event.data && /\D/.test(event.data)) {
-        event.preventDefault();
-    }
-});
-
-passwordLengthInput.addEventListener('input', function () {
-    clearTimeout(inputRefreshTimeoutId);
-    const value = this.value;
-
-    if (value === '') {
-        lastValidValue = '';
-    } else if (!isNaN(value) && Number(value) !== lastValidValue) {
-        lastValidValue = Number(value);
-    } else {
-        this.value = String(lastValidValue);
-    }
-
-    inputRefreshTimeoutId = setTimeout(() => {
-        if (this.value === '' || Number(this.value) < minPasswordLength) {
-            this.value = String(minPasswordLength);
-        } else if (Number(this.value) > maxPasswordLength) {
-            this.value = maxPasswordLength;
-        }
-        updatePassword();
-    }, 1500);
-});
-
-passwordLengthInput.addEventListener('keydown', function (event) {
-    if (event.key === 'Enter') {
-        clearTimeout(inputRefreshTimeoutId);
-        if (this.value === '' || Number(this.value) < minPasswordLength) {
-            this.value = String(minPasswordLength);
-        } else if (Number(this.value) > maxPasswordLength) {
-            this.value = maxPasswordLength;
-        }
-        updatePassword();
-    }
-});
-
-passwordLengthInput.addEventListener('blur', function () {
-    if (this.value === '' || Number(this.value) < minPasswordLength) {
-        this.value = String(minPasswordLength);
-    } else if (Number(this.value) > maxPasswordLength) {
-        this.value = maxPasswordLength;
-    }
-    updatePassword();
-});
 
 
 /***********
@@ -231,9 +178,83 @@ function updateEntropyBar(entropy) {
 }
 
 
-/*******************************
- * Increase / Decrease buttons *
- *******************************/
+/*************************
+ * Password length input *
+ *************************/
+let lastValidLength = Number(passwordLengthInput.value);
+let lengthInputChanged = false;
+let inputRefreshTimeoutId = null;
+
+/**
+ * @function updateLastValidLength
+ * @description Update the last valid password length.
+ * @param value - The new password length input value.
+ */
+function updateLastValidLength(value) {
+    if (!isNaN(parseInt(value))) {
+        if (Number(value) !== lastValidLength &&
+            Number(value) >= minPasswordLength && Number(value) <= maxPasswordLength) {
+            lastValidLength = Number(value);
+        } else if (Number(value) < minPasswordLength) {
+            lastValidLength = minPasswordLength;
+        } else if (Number(value) > maxPasswordLength) {
+            lastValidLength = maxPasswordLength;
+        }
+    }
+}
+
+passwordLengthInput.addEventListener('beforeinput', function (event) {
+    if (event.data && /\D/.test(event.data)) {
+        event.preventDefault();
+    }
+});
+
+passwordLengthInput.addEventListener('input', function () {
+    if (Number(this.value) !== lastValidLength) {
+        clearTimeout(inputRefreshTimeoutId);
+        updateLastValidLength(this.value);
+
+        if (this.value !== '') {
+            inputRefreshTimeoutId = setTimeout(() => {
+                if (Number(this.value) < minPasswordLength) {
+                    this.value = String(minPasswordLength);
+                } else if (Number(this.value) > maxPasswordLength) {
+                    this.value = String(maxPasswordLength);
+                }
+
+                updateLastValidLength(this.value);
+                updatePassword();
+                lengthInputChanged = false;
+            }, 1800);
+
+            lengthInputChanged = true;
+        }
+    }
+});
+
+passwordLengthInput.addEventListener('blur', function () {
+    this.value = lastValidLength;
+
+    if (lengthInputChanged) {
+        clearTimeout(inputRefreshTimeoutId);
+        updatePassword();
+        lengthInputChanged = false;
+    }
+});
+
+passwordLengthInput.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+        clearTimeout(inputRefreshTimeoutId);
+        updateLastValidLength(this.value);
+        this.value = lastValidLength;
+        updatePassword();
+    }
+});
+
+
+/*****************************
+ * Password length increment *
+ *****************************/
 const decreaseButton = document.getElementById('pw-length-decrease');
 const increaseButton = document.getElementById('pw-length-increase');
 
@@ -245,6 +266,7 @@ function increasePasswordLength() {
     if (passwordLengthInput.value < maxPasswordLength) {
         let value = Number(passwordLengthInput.value);
         passwordLengthInput.value = String(++value);
+        updateLastValidLength(value);
         updatePassword();
     }
 }
@@ -257,6 +279,7 @@ function decreasePasswordLength() {
     if (passwordLengthInput.value > minPasswordLength) {
         let value = Number(passwordLengthInput.value);
         passwordLengthInput.value = String(--value);
+        updateLastValidLength(value);
         updatePassword()
     }
 }
@@ -310,7 +333,6 @@ function addIncreaseDecreaseListeners(button, operation) {
 
 increaseButton.addEventListener('click', increasePasswordLength);
 decreaseButton.addEventListener('click', decreasePasswordLength);
-
 addIncreaseDecreaseListeners(increaseButton, increasePasswordLength);
 addIncreaseDecreaseListeners(decreaseButton, decreasePasswordLength);
 
@@ -319,6 +341,8 @@ addIncreaseDecreaseListeners(decreaseButton, decreasePasswordLength);
  * Copy to clipboard button *
  ****************************/
 const copyButton = document.getElementById('pw-copy');
+
+let clipboardTimeoutId = null;
 
 copyButton.addEventListener('click', () => {
     const passwordText = password.value;
