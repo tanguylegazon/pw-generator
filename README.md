@@ -37,7 +37,7 @@ To use this generator, you can either:
 This project is licensed under the terms of the Mozilla Public License Version 2.0. See the [LICENSE](LICENSE) file for
 details.
 
-This project includes third-party components distributed under their own respective licenses. See the
+This project includes third-party materials, which are distributed under their own respective licenses. See the
 [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md) file for details.
 
 ---

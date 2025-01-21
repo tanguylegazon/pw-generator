@@ -1,16 +1,16 @@
 This project is licensed under the terms of the [Mozilla Public License Version 2.0](LICENSE).
-However, this project includes third-party components, which are distributed under their own respective licenses.
+However, this project includes third-party materials, which are distributed under their own respective licenses.
 
-# List of third-party components
+# List of third-party materials
 
-- [tanguylegazon's Custom CSS](#custom-css)
+- [Tanguy Bonandrini's Custom CSS](#custom-css)
 - [Tailwind Labs' Heroicons v2.2.0](#heroicons-v220)
 
 # Licenses
 
 ## Custom CSS
 
-The [tanguylegazon's Custom CSS](https://github.com/tanguylegazon/custom-css) project is licensed under the terms of the
+The [Tanguy Bonandrini's Custom CSS](https://github.com/tanguylegazon/custom-css) project is licensed under the terms of the
 [MIT License](https://github.com/tanguylegazon/custom-css/blob/main/LICENSE).
 
 ```text
