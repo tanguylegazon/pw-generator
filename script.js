@@ -182,26 +182,7 @@ function updateEntropyBar(entropy) {
  * Password length input *
  *************************/
 let lastValidLength = Number(passwordLengthInput.value);
-let lengthInputChanged = false;
-let inputRefreshTimeoutId = null;
-
-/**
- * @function updateLastValidLength
- * @description Update the last valid password length.
- * @param value - The new password length input value.
- */
-function updateLastValidLength(value) {
-    if (!isNaN(parseInt(value))) {
-        if (Number(value) !== lastValidLength &&
-            Number(value) >= minPasswordLength && Number(value) <= maxPasswordLength) {
-            lastValidLength = Number(value);
-        } else if (Number(value) < minPasswordLength) {
-            lastValidLength = minPasswordLength;
-        } else if (Number(value) > maxPasswordLength) {
-            lastValidLength = maxPasswordLength;
-        }
-    }
-}
+let timeoutId = null;
 
 passwordLengthInput.addEventListener('beforeinput', function (event) {
     if (event.data && /\D/.test(event.data)) {
@@ -210,47 +191,27 @@ passwordLengthInput.addEventListener('beforeinput', function (event) {
 });
 
 passwordLengthInput.addEventListener('input', function () {
-    if (Number(this.value) !== lastValidLength) {
-        clearTimeout(inputRefreshTimeoutId);
-        updateLastValidLength(this.value);
-
-        if (this.value !== '') {
-            inputRefreshTimeoutId = setTimeout(() => {
-                if (Number(this.value) < minPasswordLength) {
-                    this.value = String(minPasswordLength);
-                } else if (Number(this.value) > maxPasswordLength) {
-                    this.value = String(maxPasswordLength);
-                }
-
-                updateLastValidLength(this.value);
-                updatePassword();
-                lengthInputChanged = false;
-            }, 1800);
-
-            lengthInputChanged = true;
-        }
+    let value = this.value;
+    if (value === '') lastValidLength = '';
+    value = Number(value);
+    if (!isNaN(value) && value !== lastValidLength) {
+        lastValidLength = value;
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(updatePassword, 650);
+    } else {
+        this.value = lastValidLength;
     }
 });
 
 passwordLengthInput.addEventListener('blur', function () {
-    this.value = lastValidLength;
-
-    if (lengthInputChanged) {
-        clearTimeout(inputRefreshTimeoutId);
+    if (this.value === '' || this.value < minPasswordLength) {
+        this.value = String(minPasswordLength);
         updatePassword();
-        lengthInputChanged = false;
-    }
-});
-
-passwordLengthInput.addEventListener('keydown', function (event) {
-    if (event.key === 'Enter') {
-        clearTimeout(inputRefreshTimeoutId);
-        updateLastValidLength(this.value);
-        this.value = lastValidLength;
+    } else if (this.value > maxPasswordLength) {
+        this.value = maxPasswordLength;
         updatePassword();
     }
 });
-
 
 /*****************************
  * Password length increment *
@@ -266,7 +227,6 @@ function increasePasswordLength() {
     if (passwordLengthInput.value < maxPasswordLength) {
         let value = Number(passwordLengthInput.value);
         passwordLengthInput.value = String(++value);
-        updateLastValidLength(value);
         updatePassword();
     }
 }
@@ -279,7 +239,6 @@ function decreasePasswordLength() {
     if (passwordLengthInput.value > minPasswordLength) {
         let value = Number(passwordLengthInput.value);
         passwordLengthInput.value = String(--value);
-        updateLastValidLength(value);
         updatePassword()
     }
 }
