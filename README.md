@@ -26,7 +26,7 @@ in mind, all the code is run client-side, no data is stored or sent to a server.
 
 To use this generator, you can either:
 
-1. Access the live version at [tanguy-portfolio.com/password](https://tanguy-portfolio.com/password).
+1. Access the live version at [tanguy-bonandrini.fr/password](https://tanguy-bonandrini.fr/password).
 2. Clone this repository and open `index.html` in your web browser or use a local web server.
 
 > **Note:** The `script.js` and `password.js` files use ES6 features and must be included as modules. Some browsers 
