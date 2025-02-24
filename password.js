@@ -51,7 +51,7 @@ function getRandomCharacter(charset) {
 
     do {
         randomValue = window.crypto.getRandomValues(new Uint8Array(1))[0];
-    } while (randomValue >= 256 / charset.length * charset.length);
+    } while (randomValue >= Math.floor(256 / charset.length) * charset.length);
     return charset.charAt(randomValue % charset.length);
 }
 
@@ -155,7 +155,7 @@ function getDigits(charset) {
     if (typeof charset !== "string") throw new TypeError("Character set must be a string.");
     if (charset.length === 0) throw new RangeError("Character set must not be empty.");
 
-    return [...new Set(charset.match(/\d/g))].sort().join("");
+    return [...new Set(charset.match(/\d/g) || [])].sort().join("");
 }
 
 /**
@@ -169,7 +169,7 @@ function getLowerCase(charset) {
     if (typeof charset !== "string") throw new TypeError("Character set must be a string.");
     if (charset.length === 0) throw new RangeError("Character set must not be empty.");
 
-    return [...new Set(charset.match(/[a-z]/g))].sort().join('');
+    return [...new Set(charset.match(/[a-z]/g) || [])].sort().join('');
 }
 
 /**
@@ -183,7 +183,7 @@ function getUpperCase(charset) {
     if (typeof charset !== "string") throw new TypeError("Character set must be a string.");
     if (charset.length === 0) throw new RangeError("Character set must not be empty.");
 
-    return [...new Set(charset.match(/[A-Z]/g))].sort().join('');
+    return [...new Set(charset.match(/[A-Z]/g) || [])].sort().join('');
 }
 
 /**
@@ -197,7 +197,7 @@ function getSymbols(charset) {
     if (typeof charset !== "string") throw new TypeError("Character set must be a string.");
     if (charset.length === 0) throw new RangeError("Character set must not be empty.");
 
-    return [...new Set(charset.match(/[^a-zA-Z0-9]/g))].sort().join('');
+    return [...new Set(charset.match(/[^a-zA-Z0-9]/g) || [])].sort().join('');
 }
 
 export {generatePassword, calculatePasswordEntropy};
