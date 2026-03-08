@@ -20,7 +20,7 @@ function loadPasswordGenerator() {
     const passwordPath = path.resolve(__dirname, "..", "password.js");
     const source = fs.readFileSync(passwordPath, "utf8");
     const instrumentedSource = source.replace(
-        /export\s*\{[^}]+\};?\s*$/,
+        /export\s*\{[^}]+};?\s*$/,
         "globalThis.__passwordModuleExports = { generatePassword, calculatePasswordEntropy };",
     );
 
@@ -99,8 +99,7 @@ function matchesUiConstraints(passwordText, includeSymbols, constants) {
     if (!hasAnyCharacterFromSet(passwordText, constants.digits)) return false;
     if (!hasAnyCharacterFromSet(passwordText, constants.lower)) return false;
     if (!hasAnyCharacterFromSet(passwordText, constants.upper)) return false;
-    if (includeSymbols && !hasAnyCharacterFromSet(passwordText, constants.symbols)) return false;
-    return true;
+    return !includeSymbols || hasAnyCharacterFromSet(passwordText, constants.symbols);
 }
 
 function generatePasswordForUi(generatePassword, length, charset, includeSymbols, constants) {

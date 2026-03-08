@@ -41,7 +41,7 @@ function loadGenerator() {
     const passwordPath = path.resolve(__dirname, "..", "password.js");
     const source = fs.readFileSync(passwordPath, "utf8");
     const instrumentedSource = source.replace(
-        /export\s*\{[^}]+\};?\s*$/,
+        /export\s*\{[^}]+};?\s*$/,
         "globalThis.__passwordModuleExports = { generatePassword, calculatePasswordEntropy };",
     );
 

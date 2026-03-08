@@ -101,9 +101,7 @@ function matchesUiConstraints(passwordText) {
     if (!hasAnyCharacterFromSet(passwordText, digitCharset)) return false;
     if (!hasAnyCharacterFromSet(passwordText, lowerCaseCharset)) return false;
     if (!hasAnyCharacterFromSet(passwordText, upperCaseCharset)) return false;
-    if (requiresSymbol && !hasAnyCharacterFromSet(passwordText, symbolCharset)) return false;
-
-    return true;
+    return !requiresSymbol || hasAnyCharacterFromSet(passwordText, symbolCharset);
 }
 
 function generatePasswordForUi(length) {
