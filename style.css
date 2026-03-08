@@ -102,7 +102,7 @@ body {
 
 #entropy-bar {
     width: 0;
-    background-color: #21c38b; /* emerald-460 */
+    background-color: #84cc16; /* lime-500 */
     height: .12em;
     border-radius: .5em;
     transition: background-color var(--duration-long) ease, width var(--duration-long) ease;

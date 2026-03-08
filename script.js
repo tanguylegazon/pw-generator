@@ -197,13 +197,13 @@ function updateEntropyBar(entropy) {
     const entropyBar = document.getElementById('entropy-bar');
 
     if (entropy < 0.33 * entropyForFullBar) {
-        entropyBar.style.backgroundColor = '#ca2121'; // red-650
+        entropyBar.style.backgroundColor = '#e2302f'; // red-570
     } else if (entropy < 0.6 * entropyForFullBar) {
-        entropyBar.style.backgroundColor = '#f8af19'; // amber-450
+        entropyBar.style.backgroundColor = '#f59e0b'; // amber-500
     } else if (entropy < 0.85 * entropyForFullBar) {
-        entropyBar.style.backgroundColor = '#21c38b'; // emerald-460
+        entropyBar.style.backgroundColor = '#84cc16'; // lime-500
     } else {
-        entropyBar.style.backgroundColor = '#0d9185'; // teal-610
+        entropyBar.style.backgroundColor = '#08a070'; // emerald-570
     }
 
     entropyBar.style.width = Math.min(entropy / entropyForFullBar * 100, 100) + '%';
