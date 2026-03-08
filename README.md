@@ -5,10 +5,14 @@ in mind, all the code is run client-side, no data is stored or sent to a server.
 
 ## Features
 
-- Generate cryptographically secure random passwords<sup>1</sup>.
+- Generate cryptographically secure random passwords.
 - Choose the length of the password.
 - Choose to include special characters and/or exclude ambiguous characters.
 - See the password strength based on its entropy.
+
+## Statistical randomness test
+
+At each release, statistical tests are run to ensure generated passwords are random and do not show detectable bias.
 
 ## Project files
 
@@ -39,9 +43,3 @@ details.
 
 This project includes third-party materials, which are distributed under their own respective licenses. See the
 [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md) file for details.
-
----
-
-<sup>1</sup> The generator ensures at least one digit, one lowercase, one uppercase and one special character. While
-this may mathematically reduce entropy, it enhances security against attackers unaware of the password generation
-process.

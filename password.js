@@ -4,36 +4,53 @@
  */
 
 /**
- * @function shuffleString
- * @description This function shuffles the characters in a string in a random order. It uses the Fisher-Yates shuffle
- * algorithm.
- * @param {string} string - The string to be shuffled.
+ * @function getCryptoProvider
+ * @description Returns a valid crypto provider exposing getRandomValues in browser or Node.js.
  *
- * @returns {string} The shuffled string.
+ * @returns {Crypto} A crypto provider.
  */
-function shuffleString(string) {
-    const maxUint32 = 0xFFFFFFFF;
-
-    if (typeof string !== "string") throw new TypeError("Input must be a string.");
-    if (string.length === 0) throw new RangeError("Input must not be empty.");
-    if (string.length > maxUint32) throw new RangeError("Array length must be less than 2^32.");
-
-    let array = string.split("");
-
-    for (let i = array.length - 1; i > 0; --i) {
-        const limit = maxUint32 - (maxUint32 % (i + 1));
-        let randomValue = 0;
-
-        do {
-            const randomValues = window.crypto.getRandomValues(new Uint32Array(1));
-            randomValue = randomValues[0];
-        } while (randomValue >= limit);
-
-        const randomIndex = randomValue % (i + 1);
-        [array[i], array[randomIndex]] = [array[randomIndex], array[i]];
+function getCryptoProvider() {
+    if (typeof globalThis.crypto !== "undefined" && typeof globalThis.crypto.getRandomValues === "function") {
+        return globalThis.crypto;
     }
 
-    return array.join("");
+    if (
+        typeof window !== "undefined"
+        && typeof window.crypto !== "undefined"
+        && typeof window.crypto.getRandomValues === "function"
+    ) {
+        return window.crypto;
+    }
+
+    throw new Error("Secure random generator is not available in this environment.");
+}
+
+/**
+ * @function getRandomInt
+ * @description Returns an unbiased integer in [0, maxExclusive), using rejection sampling.
+ * @param {number} maxExclusive - Upper bound excluded.
+ *
+ * @returns {number} A uniform random integer.
+ */
+function getRandomInt(maxExclusive) {
+    const maxUint32PlusOne = 0x100000000;
+    const maxUint32Array = new Uint32Array(1);
+    const cryptoProvider = getCryptoProvider();
+
+    if (typeof maxExclusive !== "number") throw new TypeError("Upper bound must be a number.");
+    if (maxExclusive !== Math.floor(maxExclusive)) throw new TypeError("Upper bound must be an integer.");
+    if (maxExclusive < 1) throw new RangeError("Upper bound must be greater than 0.");
+    if (maxExclusive > maxUint32PlusOne) throw new RangeError("Upper bound must be less than or equal to 2^32.");
+
+    const limit = Math.floor(maxUint32PlusOne / maxExclusive) * maxExclusive;
+    let randomValue = 0;
+
+    do {
+        cryptoProvider.getRandomValues(maxUint32Array);
+        randomValue = maxUint32Array[0];
+    } while (randomValue >= limit);
+
+    return randomValue % maxExclusive;
 }
 
 /**
@@ -46,19 +63,14 @@ function shuffleString(string) {
 function getRandomCharacter(charset) {
     if (typeof charset !== "string") throw new TypeError("Character set must be a string.");
     if (charset.length === 0) throw new RangeError("Character set must not be empty.");
+    if (charset.length > 0x100000000) throw new RangeError("Character set length must be less than or equal to 2^32.");
 
-    let randomValue = 0;
-
-    do {
-        randomValue = window.crypto.getRandomValues(new Uint8Array(1))[0];
-    } while (randomValue >= Math.floor(256 / charset.length) * charset.length);
-    return charset.charAt(randomValue % charset.length);
+    return charset.charAt(getRandomInt(charset.length));
 }
 
 /**
  * @function generatePassword
- * @description This function generates a password based on the user's input for length and options. It ensures at
- * least one digit, one letter, and one symbol (if symbols are included).
+ * @description This function generates a password with independent, uniform random draws from the provided charset.
  *
  * @returns {string} The generated password.
  */
@@ -70,30 +82,11 @@ function generatePassword(length = 16, charset) {
     if (charset.length === 0) throw new RangeError("Character set must not be empty.");
 
     let result = "";
-    let digitCharset = getDigits(charset);
-    let lowerCaseCharset = getLowerCase(charset);
-    let upperCaseCharset = getUpperCase(charset);
-    let symbolCharset = getSymbols(charset);
-
-    if (symbolCharset.length > 0) {
-        result += getRandomCharacter(symbolCharset);
-    }
-    if (length >= 4 || length >= 3 && symbolCharset.length === 0) {
-        result +=
-            getRandomCharacter(digitCharset)
-            + getRandomCharacter(lowerCaseCharset)
-            + getRandomCharacter(upperCaseCharset);
-    } else if (length === 3 && symbolCharset.length > 0) {
-        result += getRandomCharacter(digitCharset) + getRandomCharacter(lowerCaseCharset + upperCaseCharset);
-    } else if (length === 2 && symbolCharset.length > 0) {
-        result += getRandomCharacter(digitCharset + lowerCaseCharset + upperCaseCharset);
-    }
-
-    for (let i = result.length; i < length; ++i) {
+    for (let i = 0; i < length; ++i) {
         result += getRandomCharacter(charset);
     }
 
-    return shuffleString(result);
+    return result;
 }
 
 /**
@@ -113,91 +106,7 @@ function calculatePasswordEntropy(length = 0, charset) {
 
     if (length < 1) return 0;
 
-    let digitCharset = getDigits(charset);
-    let lowerCaseCharset = getLowerCase(charset);
-    let upperCaseCharset = getUpperCase(charset);
-    let symbolCharset = getSymbols(charset);
-
-    let entropy = length * Math.log2(charset.length);
-
-    if (symbolCharset.length > 0) {
-        entropy += Math.log2(symbolCharset.length) - Math.log2(charset.length);
-    }
-
-    if (length >= 4 || length >= 3 && symbolCharset.length === 0) {
-        entropy +=
-            Math.log2(digitCharset.length)
-            + Math.log2(lowerCaseCharset.length)
-            + Math.log2(upperCaseCharset.length)
-            - 3 * Math.log2(charset.length);
-    } else if (length === 3 && symbolCharset.length > 0) {
-        entropy +=
-            Math.log2(digitCharset.length)
-            + Math.log2(lowerCaseCharset.length + upperCaseCharset.length)
-            - 2 * Math.log2(charset.length);
-    } else if (length === 2 && symbolCharset.length > 0) {
-        entropy +=
-            Math.log2(digitCharset.length + lowerCaseCharset.length + upperCaseCharset.length)
-            - Math.log2(charset.length);
-    }
-
-    return entropy;
-}
-
-/**
- * @function getDigits
- * @description This function extracts all unique digits from the provided character set.
- * @param {string} charset - The character set.
- *
- * @returns {string} The list of all unique digits in the provided character set.
- */
-function getDigits(charset) {
-    if (typeof charset !== "string") throw new TypeError("Character set must be a string.");
-    if (charset.length === 0) throw new RangeError("Character set must not be empty.");
-
-    return [...new Set(charset.match(/\d/g) || [])].sort().join("");
-}
-
-/**
- * @function getLowerCase
- * @description This function extracts all unique lowercase letters from the provided character set.
- * @param {string} charset - The character set.
- *
- * @returns {string} The list of all unique lowercase letters in the provided character set.
- */
-function getLowerCase(charset) {
-    if (typeof charset !== "string") throw new TypeError("Character set must be a string.");
-    if (charset.length === 0) throw new RangeError("Character set must not be empty.");
-
-    return [...new Set(charset.match(/[a-z]/g) || [])].sort().join('');
-}
-
-/**
- * @function getUpperCase
- * @description This function extracts all unique uppercase letters from the provided character set.
- * @param {string} charset - The character set.
- *
- * @returns {string} The list of all unique uppercase letters in the provided character set.
- */
-function getUpperCase(charset) {
-    if (typeof charset !== "string") throw new TypeError("Character set must be a string.");
-    if (charset.length === 0) throw new RangeError("Character set must not be empty.");
-
-    return [...new Set(charset.match(/[A-Z]/g) || [])].sort().join('');
-}
-
-/**
- * @function getSymbols
- * @description This function extracts all symbols from the provided character set.
- * @param {string} charset - The character set.
- *
- * @returns {string} The list of all unique symbols in the provided character set.
- */
-function getSymbols(charset) {
-    if (typeof charset !== "string") throw new TypeError("Character set must be a string.");
-    if (charset.length === 0) throw new RangeError("Character set must not be empty.");
-
-    return [...new Set(charset.match(/[^a-zA-Z0-9]/g) || [])].sort().join('');
+    return length * Math.log2(charset.length);
 }
 
 export {generatePassword, calculatePasswordEntropy};

@@ -83,6 +83,40 @@ function updateCharset() {
     charsetLength = charset.length;
 }
 
+function hasAnyCharacterFromSet(text, set) {
+    for (let i = 0; i < text.length; ++i) {
+        if (set.includes(text[i])) return true;
+    }
+    return false;
+}
+
+function matchesUiConstraints(passwordText) {
+    const requiresSymbol = includeSymbolsCheckbox.checked;
+    const requiredClassCount = requiresSymbol ? 4 : 3;
+
+    if (passwordText.length < requiredClassCount) {
+        return true;
+    }
+
+    if (!hasAnyCharacterFromSet(passwordText, digitCharset)) return false;
+    if (!hasAnyCharacterFromSet(passwordText, lowerCaseCharset)) return false;
+    if (!hasAnyCharacterFromSet(passwordText, upperCaseCharset)) return false;
+    if (requiresSymbol && !hasAnyCharacterFromSet(passwordText, symbolCharset)) return false;
+
+    return true;
+}
+
+function generatePasswordForUi(length) {
+    const maxAttempts = 256;
+
+    for (let i = 0; i < maxAttempts; ++i) {
+        const candidate = generatePassword(length, charset);
+        if (matchesUiConstraints(candidate)) return candidate;
+    }
+
+    return generatePassword(length, charset);
+}
+
 
 /************
  * Password *
@@ -94,7 +128,7 @@ function updateCharset() {
 function updatePassword() {
     if (passwordLengthInput.value >= minPasswordLength && passwordLengthInput.value <= maxPasswordLength) {
         updateCharset();
-        textScrambleEffect(generatePassword(Number(passwordLengthInput.value), charset));
+        textScrambleEffect(generatePasswordForUi(Number(passwordLengthInput.value)));
         updateEntropy();
     }
 }
