@@ -138,7 +138,7 @@ function updatePassword() {
  * @param {string} text - The text to be scrambled.
  */
 function textScrambleEffect(text) {
-    const baseDuration = 90;
+    const baseDuration = 200;
     const durationVariance = 0.4;
     let textArray = new Array(text.length).fill('');
 
