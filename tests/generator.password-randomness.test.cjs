@@ -75,6 +75,8 @@ function runDistributionTest(generate, charset, length, samples) {
             checkCount(pairs[pair], samples * Math.floor(length / 2), 1 / size ** 2, "Pair " + pair);
         }
     }
+
+    return samples;
 }
 
 /**
@@ -107,6 +109,8 @@ function runPatternTest(generate, samples) {
     }
     checkCount(crossPasswordMatches, Math.floor(samples / 2), 1 / 256, "Successive password prefixes");
     checkCount(transitions, samples * 63, 0.5, "Binary transitions");
+
+    return samples;
 }
 
 function main() {
@@ -117,13 +121,12 @@ function main() {
         "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
         "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"]) {
         for (const length of [1, 4, 16, 64]) {
-            runDistributionTest(generatePassword, charset, length, 30000);
-            samples += 30000;
+            samples += runDistributionTest(generatePassword, charset, length, 30000);
         }
     }
-    runDistributionTest(generatePassword, "abc", 1024, 2000);
-    runPatternTest(generatePassword, 100000);
-    report("Generator statistics passed", samples + 102000);
+    samples += runDistributionTest(generatePassword, "abc", 1024, 2000);
+    samples += runPatternTest(generatePassword, 1000000);
+    report("Generator statistics passed", samples);
 }
 
 if (require.main === module) main();
