@@ -1,225 +1,93 @@
-const fs = require("node:fs");
-const path = require("node:path");
-const vm = require("node:vm");
-const {webcrypto} = require("node:crypto");
+const assert = require("node:assert/strict");
+const {checkCount, loadUi, report} = require("./randomness.helpers.cjs");
 
-function fail(message) {
-    throw new Error(message);
-}
-
-function assert(condition, message) {
-    if (!condition) fail(message);
-}
-
-function stdScore(chiSquare, degreesOfFreedom) {
-    if (degreesOfFreedom <= 0) return 0;
-    return (chiSquare - degreesOfFreedom) / Math.sqrt(2 * degreesOfFreedom);
-}
-
-function loadPasswordGenerator() {
-    const passwordPath = path.resolve(__dirname, "..", "password.js");
-    const source = fs.readFileSync(passwordPath, "utf8");
-    const instrumentedSource = source.replace(
-        /export\s*\{[^}]+};?\s*$/,
-        "globalThis.__passwordModuleExports = { generatePassword, calculatePasswordEntropy };",
-    );
-
-    if (instrumentedSource === source) {
-        fail("Failed to instrument password.js exports for test execution.");
-    }
-
-    const context = vm.createContext({
-        Uint8Array,
-        Uint32Array,
-        Math,
-        TypeError,
-        RangeError,
-        Error,
-    });
-    context.globalThis = context;
-    context.window = {crypto: webcrypto};
-    context.crypto = webcrypto;
-
-    vm.runInContext(instrumentedSource, context, {filename: "password.js"});
-    return context.__passwordModuleExports.generatePassword;
-}
-
-function extractConstString(source, name) {
-    const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const regex = new RegExp(
-        `const\\s+${escapedName}\\s*=\\s*("(?:\\\\.|[^"\\\\])*"|'(?:\\\\.|[^'\\\\])*')\\s*;`,
-    );
-    const match = source.match(regex);
-    if (!match) fail(`Could not find string constant "${name}" in script.js.`);
-    return vm.runInNewContext(match[1]);
-}
-
-function escapeForRegExp(char) {
-    return char.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
-}
-
-function loadUiCharsets() {
-    const scriptPath = path.resolve(__dirname, "..", "script.js");
-    const source = fs.readFileSync(scriptPath, "utf8");
-
-    return {
-        digits: extractConstString(source, "digitCharset"),
-        lower: extractConstString(source, "lowerCaseCharset"),
-        upper: extractConstString(source, "upperCaseCharset"),
-        symbols: extractConstString(source, "symbolCharset"),
-        ambiguous: extractConstString(source, "ambiguousCharset"),
-    };
-}
-
-function buildCharsetFromUiConfig(constants, includeSymbols, easyCharacters) {
-    let charset = includeSymbols
-        ? constants.digits + constants.lower + constants.upper + constants.symbols
-        : constants.digits + constants.lower + constants.upper;
-
-    if (easyCharacters) {
-        for (let i = 0; i < constants.ambiguous.length; ++i) {
-            charset = charset.replace(new RegExp(escapeForRegExp(constants.ambiguous[i]), "g"), "");
-        }
-    }
-
-    return charset;
-}
-
-function hasAnyCharacterFromSet(text, set) {
-    for (let i = 0; i < text.length; ++i) {
-        if (set.includes(text[i])) return true;
-    }
-    return false;
-}
-
-function matchesUiConstraints(passwordText, includeSymbols, constants) {
-    const requiredClassCount = includeSymbols ? 4 : 3;
-    if (passwordText.length < requiredClassCount) return true;
-
-    if (!hasAnyCharacterFromSet(passwordText, constants.digits)) return false;
-    if (!hasAnyCharacterFromSet(passwordText, constants.lower)) return false;
-    if (!hasAnyCharacterFromSet(passwordText, constants.upper)) return false;
-    return !includeSymbols || hasAnyCharacterFromSet(passwordText, constants.symbols);
-}
-
-function generatePasswordForUi(generatePassword, length, charset, includeSymbols, constants) {
-    let candidate = generatePassword(length, charset);
-
-    while (!matchesUiConstraints(candidate, includeSymbols, constants)) {
-        candidate = generatePassword(length, charset);
-    }
-
-    return candidate;
-}
-
-function runUiScenarioTest(generatePassword, constants, options) {
-    const {includeSymbols, easyCharacters, passwordLength, sampleSize} = options;
-    const charset = buildCharsetFromUiConfig(constants, includeSymbols, easyCharacters);
-    const characters = [...charset];
-    const charsetSet = new Set(characters);
-    const requiredClassCount = includeSymbols ? 4 : 3;
-
-    const classes = {
-        digit: [...new Set(charset.match(/\d/g) || [])],
-        lower: [...new Set(charset.match(/[a-z]/g) || [])],
-        upper: [...new Set(charset.match(/[A-Z]/g) || [])],
-    };
-    if (includeSymbols) {
-        classes.symbol = [...new Set(charset.match(/[^a-zA-Z0-9]/g) || [])];
-    }
-
-    const charCounts = new Map(characters.map((c) => [c, 0]));
-    const classTotals = Object.fromEntries(Object.keys(classes).map((k) => [k, 0]));
-
-    for (let i = 0; i < sampleSize; ++i) {
-        const password = generatePasswordForUi(generatePassword, passwordLength, charset, includeSymbols, constants);
-        assert(password.length === passwordLength, `Invalid length at sample ${i}.`);
-
-        for (let j = 0; j < password.length; ++j) {
-            const char = password[j];
-            assert(charsetSet.has(char), `Character outside charset at sample ${i}.`);
-            charCounts.set(char, charCounts.get(char) + 1);
-        }
-
-        if (passwordLength >= requiredClassCount) {
-            assert(matchesUiConstraints(password, includeSymbols, constants), `Missing UI class constraint at sample ${i}.`);
-        }
-    }
-
-    const classOfChar = new Map();
-    for (const [className, classChars] of Object.entries(classes)) {
-        for (const c of classChars) classOfChar.set(c, className);
-    }
-    for (const [char, count] of charCounts.entries()) {
-        classTotals[classOfChar.get(char)] += count;
-    }
-
-    const threshold = 6.0;
-    const testKind = passwordLength < requiredClassCount ? "uniform_all_chars" : "uniform_within_each_class";
-    const scores = {};
-
-    if (testKind === "uniform_all_chars") {
-        const expected = (sampleSize * passwordLength) / characters.length;
-        let chi = 0;
-        for (const c of characters) {
-            const observed = charCounts.get(c);
-            chi += ((observed - expected) ** 2) / expected;
-        }
-        const z = stdScore(chi, characters.length - 1);
-        assert(Math.abs(z) < threshold, `UI short-length distribution deviates too much (z=${z.toFixed(2)}).`);
-        scores.allChars = z;
-    } else {
-        for (const [className, classChars] of Object.entries(classes)) {
-            const expected = classTotals[className] / classChars.length;
-            let chi = 0;
-            for (const c of classChars) {
-                const observed = charCounts.get(c);
-                chi += ((observed - expected) ** 2) / expected;
+/**
+ * @function completionProbability
+ * @description Computes the probability of completing all required classes by dynamic programming.
+ */
+function completionProbability(probabilities, length, initialMask) {
+    let states = new Float64Array(1 << probabilities.length);
+    states[initialMask] = 1;
+    for (let position = 0; position < length; ++position) {
+        const next = new Float64Array(states.length);
+        for (let mask = 0; mask < states.length; ++mask) {
+            for (let category = 0; category < probabilities.length; ++category) {
+                next[mask | (1 << category)] += states[mask] * probabilities[category];
             }
-            const z = stdScore(chi, classChars.length - 1);
-            assert(Math.abs(z) < threshold, `UI class "${className}" distribution deviates too much (z=${z.toFixed(2)}).`);
-            scores[className] = z;
+        }
+        states = next;
+    }
+    return states[states.length - 1];
+}
+
+/**
+ * @function runScenario
+ * @description Checks actual UI outputs against uniform sampling conditioned on the required categories.
+ */
+function runScenario(ui, symbols, easy, length, samples) {
+    const {charset, classes, available, ambiguous} = ui.configure(symbols, easy);
+    const expectedCharset = new Set(Array.from(available).filter(char => !easy || !ambiguous.includes(char)));
+    assert.deepEqual(new Set(charset), expectedCharset, "UI charset does not match the selected options.");
+    const characters = Array.from(charset);
+    const size = characters.length;
+    const indices = new Map(characters.map((char, index) => [char, index]));
+    const categoryOf = characters.map(char => classes.findIndex(category => category.includes(char)));
+    const probabilities = classes.map(category => category.length / size);
+    assert(classes.every(category => category.length > 0), "Empty UI category.");
+    assert.equal(classes.reduce((total, category) => total + category.length, 0), size);
+    const constrained = length >= classes.length;
+    const acceptance = constrained ? completionProbability(probabilities, length, 0) : 1;
+    const positions = Array.from({length}, () => new Uint32Array(size));
+    const pairs = new Uint32Array(classes.length ** 2);
+    for (let sample = 0; sample < samples; ++sample) {
+        const password = Array.from(ui.generate(length));
+        assert.equal(password.length, length);
+        let mask = 0;
+        for (let position = 0; position < length; ++position) {
+            const index = indices.get(password[position]);
+            assert.notEqual(index, undefined, "Character outside UI charset.");
+            ++positions[position][index];
+            mask |= 1 << categoryOf[index];
+        }
+        if (constrained) assert.equal(mask, (1 << classes.length) - 1, "Missing required category.");
+        if (length > 1) {
+            const pair = categoryOf[indices.get(password[0])] * classes.length + categoryOf[indices.get(password[1])];
+            ++pairs[pair];
         }
     }
-
-    return {
-        includeSymbols,
-        easyCharacters,
-        passwordLength,
-        sampleSize,
-        charsetSize: characters.length,
-        testKind,
-        scores,
-    };
+    for (let index = 0; index < size; ++index) {
+        const probability = (constrained
+            ? completionProbability(probabilities, length - 1, 1 << categoryOf[index]) / acceptance : 1) / size;
+        for (let position = 0; position < length; ++position) {
+            const name = "UI position " + position + ", character " + index;
+            checkCount(positions[position][index], samples, probability, name);
+        }
+    }
+    if (length > 1) {
+        for (let first = 0; first < classes.length; ++first) {
+            for (let second = 0; second < classes.length; ++second) {
+                const probability = probabilities[first] * probabilities[second] * (constrained
+                    ? completionProbability(probabilities, length - 2, (1 << first) | (1 << second)) / acceptance : 1);
+                const name = "UI category pair " + first + "," + second;
+                checkCount(pairs[first * classes.length + second], samples, probability, name);
+            }
+        }
+    }
 }
 
 function main() {
-    const generatePassword = loadPasswordGenerator();
-    const constants = loadUiCharsets();
-
-    const lengths = [1, 2, 4, 16];
-    const configs = [
-        {includeSymbols: true, easyCharacters: false},
-        {includeSymbols: true, easyCharacters: true},
-        {includeSymbols: false, easyCharacters: false},
-        {includeSymbols: false, easyCharacters: true},
-    ];
-
-    const sampleSize = Number(process.env.UI_RANDOMNESS_SAMPLE_SIZE || 6000);
-    const reports = [];
-
-    for (const config of configs) {
-        for (const passwordLength of lengths) {
-            reports.push(runUiScenarioTest(generatePassword, constants, {
-                ...config,
-                passwordLength,
-                sampleSize,
-            }));
+    const ui = loadUi();
+    let samples = 0;
+    for (const symbols of [false, true]) {
+        for (const easy of [false, true]) {
+            for (const length of [1, 2, 3, 4, 16, 64]) {
+                runScenario(ui, symbols, easy, length, 20000);
+                samples += 20000;
+            }
         }
     }
-
-    console.log("UI randomness test passed.");
-    console.log(JSON.stringify(reports, null, 2));
+    report("UI statistics passed", samples);
 }
 
-main();
+if (require.main === module) main();
+module.exports = {completionProbability, runScenario};

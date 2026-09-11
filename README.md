@@ -12,7 +12,18 @@ in mind, all the code is run client-side, no data is stored or sent to a server.
 
 ## Statistical randomness test
 
-At each release, statistical tests are run to ensure generated passwords are random and do not show detectable bias.
+The generator is automatically tested for detectable bias across character frequencies, positions, pairs, binary
+patterns, correlations and successive outputs. UI generation rules are checked against their expected distribution.
+
+Run locally:
+
+```sh
+node tests/randomness.validation.test.cjs
+node tests/generator.password-randomness.test.cjs
+node tests/policy.password-randomness.test.cjs
+```
+
+Statistical tests detect regressions; cryptographic security relies on Web Crypto and unbiased rejection sampling.
 
 ## Project files
 

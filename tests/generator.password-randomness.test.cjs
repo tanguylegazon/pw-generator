@@ -1,246 +1,130 @@
-const fs = require("node:fs");
-const path = require("node:path");
-const vm = require("node:vm");
-const {webcrypto} = require("node:crypto");
+const assert = require("node:assert/strict");
+const {checkCount, loadGenerator, report} = require("./randomness.helpers.cjs");
 
 /**
- * Throw a standardized test failure.
- * @param {string} message
+ * @function runValidationTests
+ * @description Checks rejection boundaries and invalid inputs with controlled random values.
  */
-function fail(message) {
-    throw new Error(message);
-}
-
-/**
- * Assert a condition and fail the test with a message if false.
- * @param {boolean} condition
- * @param {string} message
- */
-function assert(condition, message) {
-    if (!condition) fail(message);
-}
-
-/**
- * Assert that a function throws an error of the expected type.
- * @param {Function} operation
- * @param {Function} errorType
- * @param {string} message
- */
-function assertThrows(operation, errorType, message) {
-    try {
-        operation();
-    } catch (error) {
-        assert(error instanceof errorType, message);
-        return;
-    }
-
-    fail(message);
-}
-
-/**
- * Convert a chi-square statistic to an approximate standardized score.
- * This makes thresholds easier to read and compare across scenarios.
- * @param {number} chiSquare
- * @param {number} degreesOfFreedom
- * @returns {number}
- */
-function stdScore(chiSquare, degreesOfFreedom) {
-    if (degreesOfFreedom <= 0) return 0;
-    return (chiSquare - degreesOfFreedom) / Math.sqrt(2 * degreesOfFreedom);
-}
-
-/**
- * Load password.js in a sandboxed VM context and expose its exported functions
- * for Node-based testing without changing production code.
- * @returns {{generatePassword: Function, calculatePasswordEntropy: Function, maxPasswordLength: number}}
- */
-function loadGenerator() {
-    const passwordPath = path.resolve(__dirname, "..", "password.js");
-    const source = fs.readFileSync(passwordPath, "utf8");
-    const instrumentedSource = source.replace(
-        /export\s*\{[^}]+};?\s*$/,
-        "globalThis.__passwordModuleExports = { generatePassword, calculatePasswordEntropy, maxPasswordLength };",
-    );
-
-    if (instrumentedSource === source) {
-        fail("Failed to instrument password.js exports for test execution.");
-    }
-
-    const context = vm.createContext({
-        Uint8Array,
-        Uint32Array,
-        Math,
-        TypeError,
-        RangeError,
-        Error,
-    });
-    context.globalThis = context;
-    context.window = {crypto: webcrypto};
-    context.crypto = webcrypto;
-
-    vm.runInContext(instrumentedSource, context, {filename: "password.js"});
-    return context.__passwordModuleExports;
-}
-
-/**
- * Run deterministic validation checks for the public generator functions.
- * @param {Function} generatePassword
- * @param {Function} calculatePasswordEntropy
- * @param {number} maxPasswordLength
- */
-function runValidationTests(generatePassword, calculatePasswordEntropy, maxPasswordLength) {
-    const unicodePassword = generatePassword(16, "a😀");
-
-    assert(Array.from(unicodePassword).length === 16, "Unicode password length is invalid.");
-    assert(calculatePasswordEntropy(1, "a😀") === 1, "Unicode charset entropy is invalid.");
-    assertThrows(
-        () => generatePassword(Infinity, "abc"),
-        TypeError,
-        "Infinite password length must be rejected.",
-    );
-    assertThrows(
-        () => generatePassword(maxPasswordLength + 1, "abc"),
-        RangeError,
-        "Password length above the maximum must be rejected.",
-    );
-    assertThrows(
-        () => generatePassword(16, "aab"),
-        RangeError,
-        "Duplicate characters must be rejected.",
-    );
-}
-
-/**
- * Run statistical checks for uniform character selection:
- * - global distribution across all generated characters
- * - per-position distribution
- * - collision count (reported for observability)
- * @param {Function} generatePassword
- * @param {{sampleSize:number,passwordLength:number,charset:string}} options
- * @returns {{
- *   sampleSize:number,
- *   passwordLength:number,
- *   charsetSize:number,
- *   collisions:number,
- *   globalStdScore:number,
- *   maxPositionStdScore:number
- * }}
- */
-function runUniformRandomnessTest(generatePassword, options) {
-    const {sampleSize, passwordLength, charset} = options;
-    const characters = [...charset];
-    const charsetSize = characters.length;
-    const charsetSet = new Set(characters);
-    const expectedPerCharacter = (sampleSize * passwordLength) / charsetSize;
-
-    const characterCounts = new Map(characters.map((c) => [c, 0]));
-    const perPositionCounts = Array.from(
-        {length: passwordLength},
-        () => new Map(characters.map((c) => [c, 0])),
-    );
-    const seenPasswords = new Set();
-    let collisions = 0;
-
-    for (let i = 0; i < sampleSize; ++i) {
-        const password = generatePassword(passwordLength, charset);
-        assert(password.length === passwordLength, `Invalid password length at sample ${i}.`);
-
-        for (let pos = 0; pos < passwordLength; ++pos) {
-            const char = password[pos];
-            assert(charsetSet.has(char), `Character outside charset at sample ${i}.`);
-            characterCounts.set(char, characterCounts.get(char) + 1);
-            perPositionCounts[pos].set(char, perPositionCounts[pos].get(char) + 1);
+function runValidationTests() {
+    const values = [0xffffffff, 0xfffffffe, 0xfffffffd, 0];
+    const requests = [];
+    const controlled = loadGenerator({getRandomValues(array) {
+        requests.push(array.length);
+        for (let i = 0; i < array.length; ++i) {
+            assert(values.length > 0, "Unexpected random draw.");
+            array[i] = values.shift();
         }
+        return array;
+    }});
+    assert.equal(controlled.generatePassword(3, "abc"), "acb");
+    assert.deepEqual(requests, [3, 1]);
+    const rejected = [0xfffffffa, 0xffffffff, 0xfffffff9];
+    const repeated = loadGenerator({getRandomValues(array) {
+        assert.equal(array.length, 1);
+        assert(rejected.length > 0, "Unexpected retry.");
+        array[0] = rejected.shift();
+        return array;
+    }});
+    assert.equal(repeated.generatePassword(1, "0123456789"), "9");
+    assert.equal(rejected.length, 0);
+    assert.throws(() => loadGenerator({}).generatePassword(1, "ab"), /Secure random generator/);
+    assert.throws(() => loadGenerator({getRandomValues() {
+        throw new Error("Random source failure.");
+    }}).generatePassword(1, "ab"), /Random source failure/);
+    const generator = loadGenerator();
+    for (const length of [0, -1, 1.5, NaN, Infinity, "16", 1025]) {
+        assert.throws(() => generator.generatePassword(length, "ab"));
+    }
+    for (const charset of ["", "aab", "😀😀", null, 42]) {
+        assert.throws(() => generator.generatePassword(16, charset));
+    }
+    assert.equal(generator.generatePassword(1024, "a"), "a".repeat(1024));
+    assert.equal(generator.calculatePasswordEntropy(1, "a😀"), 1);
+}
 
-        if (seenPasswords.has(password)) {
-            collisions += 1;
-        } else {
-            seenPasswords.add(password);
+/**
+ * @function runDistributionTest
+ * @description Checks global and per-position frequencies and non-overlapping pairs under the IID null.
+ */
+function runDistributionTest(generate, charset, length, samples) {
+    const characters = Array.from(charset);
+    const size = characters.length;
+    const indices = new Map(characters.map((char, index) => [char, index]));
+    const counts = new Uint32Array(size);
+    const positions = Array.from({length}, () => new Uint32Array(size));
+    const pairs = new Uint32Array(size * size);
+    for (let sample = 0; sample < samples; ++sample) {
+        const password = Array.from(generate(length, charset));
+        assert.equal(password.length, length);
+        for (let position = 0; position < length; ++position) {
+            const index = indices.get(password[position]);
+            assert.notEqual(index, undefined, "Character outside charset.");
+            ++counts[index];
+            ++positions[position][index];
+            if (position % 2 === 1) ++pairs[indices.get(password[position - 1]) * size + index];
         }
     }
-
-    let globalChiSquare = 0;
-    for (const char of characters) {
-        const observed = characterCounts.get(char);
-        globalChiSquare += ((observed - expectedPerCharacter) ** 2) / expectedPerCharacter;
-    }
-    const globalStdScore = stdScore(globalChiSquare, charsetSize - 1);
-
-    let maxPositionStdScore = 0;
-    const expectedPerCharacterPerPosition = sampleSize / charsetSize;
-    for (let pos = 0; pos < passwordLength; ++pos) {
-        let chiSquare = 0;
-        for (const char of characters) {
-            const observed = perPositionCounts[pos].get(char);
-            chiSquare += ((observed - expectedPerCharacterPerPosition) ** 2) / expectedPerCharacterPerPosition;
+    for (let index = 0; index < size; ++index) {
+        checkCount(counts[index], samples * length, 1 / size, "Global character " + index);
+        for (let position = 0; position < length; ++position) {
+            checkCount(positions[position][index], samples, 1 / size, "Position " + position + ", character " + index);
         }
-        const z = stdScore(chiSquare, charsetSize - 1);
-        maxPositionStdScore = Math.max(maxPositionStdScore, Math.abs(z));
     }
-
-    const threshold = 6.0;
-    assert(
-        Math.abs(globalStdScore) < threshold,
-        `Global character distribution deviates too much (z=${globalStdScore.toFixed(2)}).`,
-    );
-    assert(
-        maxPositionStdScore < threshold,
-        `Character distribution by position deviates too much (|z|max=${maxPositionStdScore.toFixed(2)}).`,
-    );
-
-    return {
-        sampleSize,
-        passwordLength,
-        charsetSize,
-        collisions,
-        globalStdScore,
-        maxPositionStdScore,
-    };
+    if (length > 1) {
+        for (let pair = 0; pair < pairs.length; ++pair) {
+            checkCount(pairs[pair], samples * Math.floor(length / 2), 1 / size ** 2, "Pair " + pair);
+        }
+    }
 }
 
 /**
- * Execute the full test matrix:
- * - multiple charset scenarios
- * - multiple password lengths
- * Sample size can be overridden with RANDOMNESS_SAMPLE_SIZE.
+ * @function runPatternTest
+ * @description Checks eight-bit words and selected lags with one independent trial per password.
  */
+function runPatternTest(generate, samples) {
+    const lags = [1, 2, 3, 4, 8, 16, 32, 63];
+    const equalities = new Uint32Array(lags.length);
+    const words = new Uint32Array(256);
+    let transitions = 0;
+    let crossPasswordMatches = 0;
+    let previous;
+    for (let sample = 0; sample < samples; ++sample) {
+        const password = generate(64, "01");
+        assert.match(password, /^[01]{64}$/);
+        ++words[parseInt(password.slice(0, 8), 2)];
+        for (let position = 1; position < password.length; ++position) {
+            if (password[position - 1] !== password[position]) ++transitions;
+        }
+        for (let index = 0; index < lags.length; ++index) {
+            if (password[0] === password[lags[index]]) ++equalities[index];
+        }
+        if (sample % 2 === 0) previous = password;
+        else if (previous.slice(0, 8) === password.slice(0, 8)) ++crossPasswordMatches;
+    }
+    for (let word = 0; word < words.length; ++word) checkCount(words[word], samples, 1 / 256, "Binary word " + word);
+    for (let index = 0; index < lags.length; ++index) {
+        checkCount(equalities[index], samples, 0.5, "Equality at lag " + lags[index]);
+    }
+    checkCount(crossPasswordMatches, Math.floor(samples / 2), 1 / 256, "Successive password prefixes");
+    checkCount(transitions, samples * 63, 0.5, "Binary transitions");
+}
+
 function main() {
-    const {generatePassword, calculatePasswordEntropy, maxPasswordLength} = loadGenerator();
-    runValidationTests(generatePassword, calculatePasswordEntropy, maxPasswordLength);
-    const scenarios = [
-        {
-            name: "alnum_symbols",
-            charset: "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~",
-        },
-        {
-            name: "alnum_only",
-            charset: "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
-        },
-        {
-            name: "digits_only",
-            charset: "0123456789",
-        },
-    ];
-    const lengths = [1, 2, 4, 8, 16, 32, 64];
-    const sampleSize = Number(process.env.RANDOMNESS_SAMPLE_SIZE || 20000);
-    const reports = [];
-
-    for (const scenario of scenarios) {
-        for (const passwordLength of lengths) {
-            const report = runUniformRandomnessTest(generatePassword, {
-                sampleSize,
-                passwordLength,
-                charset: scenario.charset,
-            });
-            reports.push({
-                scenario: scenario.name,
-                ...report,
-            });
+    runValidationTests();
+    const {generatePassword} = loadGenerator();
+    let samples = 0;
+    for (const charset of ["01", "0123456789", "a😀é🦊",
+        "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ",
+        "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"]) {
+        for (const length of [1, 4, 16, 64]) {
+            runDistributionTest(generatePassword, charset, length, 30000);
+            samples += 30000;
         }
     }
-
-    console.log("Randomness test passed.");
-    console.log(JSON.stringify(reports, null, 2));
+    runDistributionTest(generatePassword, "abc", 1024, 2000);
+    runPatternTest(generatePassword, 100000);
+    report("Generator statistics passed", samples + 102000);
 }
 
-main();
+if (require.main === module) main();
+module.exports = {runDistributionTest, runPatternTest};
