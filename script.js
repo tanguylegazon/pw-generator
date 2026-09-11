@@ -3,7 +3,7 @@
  * If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import {generatePassword, calculatePasswordEntropy} from './password.js';
+import {generatePassword, calculatePasswordEntropy, maxPasswordLength} from './password.js';
 
 /**
  * @constant {number} minPasswordLength
@@ -12,18 +12,13 @@ import {generatePassword, calculatePasswordEntropy} from './password.js';
 const minPasswordLength = 1;
 
 /**
- * @constant {number} maxPasswordLength
- * @description The maximum length that a password can be.
- */
-const maxPasswordLength = 1024;
-
-/**
  * @constant {number} entropyForFullBar
  * @description The entropy value (in bits) required to completely fill the password strength bar.
  */
 const entropyForFullBar = 128;
 
 const password = document.getElementById('pw-field');
+const passwordAnimation = document.getElementById('pw-animation');
 const passwordLengthInput = document.getElementById('pw-length');
 const refreshButton = document.getElementById('pw-refresh');
 const includeSymbolsCheckbox = document.getElementById('include-symbols');
@@ -54,6 +49,9 @@ if (localStorage.getItem('easyCharacters') === null) {
  ***********/
 let charset = "";
 let charsetLength = 0;
+let currentPassword = "";
+let passwordTimeoutId = null;
+let animationFrameId = null;
 
 const digitCharset = "0123456789";
 const lowerCaseCharset = "abcdefghijklmnopqrstuvwxyz";
@@ -105,14 +103,13 @@ function matchesUiConstraints(passwordText) {
 }
 
 function generatePasswordForUi(length) {
-    const maxAttempts = 256;
+    let candidate = generatePassword(length, charset);
 
-    for (let i = 0; i < maxAttempts; ++i) {
-        const candidate = generatePassword(length, charset);
-        if (matchesUiConstraints(candidate)) return candidate;
+    while (!matchesUiConstraints(candidate)) {
+        candidate = generatePassword(length, charset);
     }
 
-    return generatePassword(length, charset);
+    return candidate;
 }
 
 
@@ -125,8 +122,12 @@ function generatePasswordForUi(length) {
  */
 function updatePassword() {
     if (passwordLengthInput.value >= minPasswordLength && passwordLengthInput.value <= maxPasswordLength) {
+        clearTimeout(passwordTimeoutId);
+        passwordTimeoutId = null;
         updateCharset();
-        textScrambleEffect(generatePasswordForUi(Number(passwordLengthInput.value)));
+        currentPassword = generatePasswordForUi(Number(passwordLengthInput.value));
+        password.value = currentPassword;
+        textScrambleEffect(currentPassword);
         updateEntropy();
     }
 }
@@ -140,36 +141,52 @@ function updatePassword() {
 function textScrambleEffect(text) {
     const baseDuration = 200;
     const durationVariance = 0.4;
-    let textArray = new Array(text.length).fill('');
+    const textArray = new Array(text.length).fill('');
 
-    let durations = [];
+    const durations = [];
     for (let i = 0; i < text.length; ++i) {
         durations[i] =
             baseDuration * ((1 - durationVariance) + 2 * durationVariance * Math.random());
     }
 
-    let counters = new Array(text.length).fill(0);
-    let frameCounts = durations.map(duration => duration / 10);
+    if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+    }
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        password.classList.remove('scrambling');
+        passwordAnimation.hidden = true;
+        return;
+    }
 
-    let intervalId = setInterval(() => {
+    const startTime = performance.now();
+    password.classList.add('scrambling');
+    passwordAnimation.hidden = false;
+
+    function updateFrame(currentTime) {
         let allDone = true;
         for (let i = 0; i < text.length; ++i) {
-            if (counters[i] < frameCounts[i]) {
-                let num = Math.floor(Math.random() * charset.length);
+            if (currentTime - startTime < durations[i]) {
+                const num = Math.floor(Math.random() * charset.length);
                 textArray[i] = charset.charAt(num);
                 allDone = false;
-                ++counters[i];
             } else {
                 textArray[i] = text.charAt(i);
             }
         }
 
-        password.value = textArray.join('');
+        passwordAnimation.value = textArray.join('');
 
         if (allDone) {
-            clearInterval(intervalId);
+            password.classList.remove('scrambling');
+            passwordAnimation.hidden = true;
+            animationFrameId = null;
+        } else {
+            animationFrameId = requestAnimationFrame(updateFrame);
         }
-    }, 10);
+    }
+
+    animationFrameId = requestAnimationFrame(updateFrame);
 }
 
 updatePassword();
@@ -214,7 +231,6 @@ function updateEntropyBar(entropy) {
  * Password length input *
  *************************/
 let lastValidLength = Number(passwordLengthInput.value);
-let timeoutId = null;
 
 passwordLengthInput.addEventListener('beforeinput', function (event) {
     if (event.data && /\D/.test(event.data)) {
@@ -228,8 +244,8 @@ passwordLengthInput.addEventListener('input', function () {
     value = Number(value);
     if (!isNaN(value) && value !== lastValidLength) {
         lastValidLength = value;
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(updatePassword, 650);
+        clearTimeout(passwordTimeoutId);
+        passwordTimeoutId = setTimeout(updatePassword, 650);
     } else {
         this.value = lastValidLength;
     }
@@ -335,12 +351,12 @@ const copyButton = document.getElementById('pw-copy');
 
 let clipboardTimeoutId = null;
 
-copyButton.addEventListener('click', () => {
-    const passwordText = password.value;
+copyButton.addEventListener('click', async () => {
     password.focus();
     password.select();
 
-    navigator.clipboard.writeText(passwordText).then(() => {
+    try {
+        await navigator.clipboard.writeText(currentPassword);
         const copiedElements = copyButton.querySelectorAll('.copied');
         const copyElements = copyButton.querySelectorAll('.copy');
 
@@ -358,7 +374,9 @@ copyButton.addEventListener('click', () => {
             copiedElements.forEach(element => element.style.opacity = '0');
             copyElements.forEach(element => element.style.opacity = '1');
         }, 2500);
-    });
+    } catch (error) {
+        console.error('Failed to copy password.', error);
+    }
 });
 
 
@@ -397,10 +415,12 @@ easyCharacters.addEventListener('click', () => {
 });
 
 const refreshButtonSVG = refreshButton.querySelector('svg');
+let refreshTimeoutId = null;
+
 refreshButton.onclick = () => {
-    clearTimeout(clipboardTimeoutId);
+    clearTimeout(refreshTimeoutId);
     refreshButtonSVG.classList.add('rotate');
-    clipboardTimeoutId = setTimeout(() =>
+    refreshTimeoutId = setTimeout(() =>
         refreshButtonSVG.classList.remove('rotate'), 750
     );
 };

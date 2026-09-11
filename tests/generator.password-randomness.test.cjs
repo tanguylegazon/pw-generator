@@ -21,6 +21,23 @@ function assert(condition, message) {
 }
 
 /**
+ * Assert that a function throws an error of the expected type.
+ * @param {Function} operation
+ * @param {Function} errorType
+ * @param {string} message
+ */
+function assertThrows(operation, errorType, message) {
+    try {
+        operation();
+    } catch (error) {
+        assert(error instanceof errorType, message);
+        return;
+    }
+
+    fail(message);
+}
+
+/**
  * Convert a chi-square statistic to an approximate standardized score.
  * This makes thresholds easier to read and compare across scenarios.
  * @param {number} chiSquare
@@ -35,14 +52,14 @@ function stdScore(chiSquare, degreesOfFreedom) {
 /**
  * Load password.js in a sandboxed VM context and expose its exported functions
  * for Node-based testing without changing production code.
- * @returns {{generatePassword: Function, calculatePasswordEntropy: Function}}
+ * @returns {{generatePassword: Function, calculatePasswordEntropy: Function, maxPasswordLength: number}}
  */
 function loadGenerator() {
     const passwordPath = path.resolve(__dirname, "..", "password.js");
     const source = fs.readFileSync(passwordPath, "utf8");
     const instrumentedSource = source.replace(
         /export\s*\{[^}]+};?\s*$/,
-        "globalThis.__passwordModuleExports = { generatePassword, calculatePasswordEntropy };",
+        "globalThis.__passwordModuleExports = { generatePassword, calculatePasswordEntropy, maxPasswordLength };",
     );
 
     if (instrumentedSource === source) {
@@ -63,6 +80,34 @@ function loadGenerator() {
 
     vm.runInContext(instrumentedSource, context, {filename: "password.js"});
     return context.__passwordModuleExports;
+}
+
+/**
+ * Run deterministic validation checks for the public generator functions.
+ * @param {Function} generatePassword
+ * @param {Function} calculatePasswordEntropy
+ * @param {number} maxPasswordLength
+ */
+function runValidationTests(generatePassword, calculatePasswordEntropy, maxPasswordLength) {
+    const unicodePassword = generatePassword(16, "a😀");
+
+    assert(Array.from(unicodePassword).length === 16, "Unicode password length is invalid.");
+    assert(calculatePasswordEntropy(1, "a😀") === 1, "Unicode charset entropy is invalid.");
+    assertThrows(
+        () => generatePassword(Infinity, "abc"),
+        TypeError,
+        "Infinite password length must be rejected.",
+    );
+    assertThrows(
+        () => generatePassword(maxPasswordLength + 1, "abc"),
+        RangeError,
+        "Password length above the maximum must be rejected.",
+    );
+    assertThrows(
+        () => generatePassword(16, "aab"),
+        RangeError,
+        "Duplicate characters must be rejected.",
+    );
 }
 
 /**
@@ -160,7 +205,8 @@ function runUniformRandomnessTest(generatePassword, options) {
  * Sample size can be overridden with RANDOMNESS_SAMPLE_SIZE.
  */
 function main() {
-    const {generatePassword} = loadGenerator();
+    const {generatePassword, calculatePasswordEntropy, maxPasswordLength} = loadGenerator();
+    runValidationTests(generatePassword, calculatePasswordEntropy, maxPasswordLength);
     const scenarios = [
         {
             name: "alnum_symbols",

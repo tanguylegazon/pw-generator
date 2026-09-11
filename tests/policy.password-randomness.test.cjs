@@ -103,12 +103,13 @@ function matchesUiConstraints(passwordText, includeSymbols, constants) {
 }
 
 function generatePasswordForUi(generatePassword, length, charset, includeSymbols, constants) {
-    const maxAttempts = 256;
-    for (let i = 0; i < maxAttempts; ++i) {
-        const candidate = generatePassword(length, charset);
-        if (matchesUiConstraints(candidate, includeSymbols, constants)) return candidate;
+    let candidate = generatePassword(length, charset);
+
+    while (!matchesUiConstraints(candidate, includeSymbols, constants)) {
+        candidate = generatePassword(length, charset);
     }
-    return generatePassword(length, charset);
+
+    return candidate;
 }
 
 function runUiScenarioTest(generatePassword, constants, options) {

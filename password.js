@@ -4,6 +4,12 @@
  */
 
 /**
+ * @constant {number} maxPasswordLength
+ * @description The maximum length that a password can be.
+ */
+const maxPasswordLength = 1024;
+
+/**
  * @function getCryptoProvider
  * @description Returns a valid crypto provider exposing getRandomValues in browser or Node.js.
  *
@@ -26,46 +32,21 @@ function getCryptoProvider() {
 }
 
 /**
- * @function getRandomInt
- * @description Returns an unbiased integer in [0, maxExclusive), using rejection sampling.
- * @param {number} maxExclusive - Upper bound excluded.
- *
- * @returns {number} A uniform random integer.
- */
-function getRandomInt(maxExclusive) {
-    const maxUint32PlusOne = 0x100000000;
-    const maxUint32Array = new Uint32Array(1);
-    const cryptoProvider = getCryptoProvider();
-
-    if (typeof maxExclusive !== "number") throw new TypeError("Upper bound must be a number.");
-    if (maxExclusive !== Math.floor(maxExclusive)) throw new TypeError("Upper bound must be an integer.");
-    if (maxExclusive < 1) throw new RangeError("Upper bound must be greater than 0.");
-    if (maxExclusive > maxUint32PlusOne) throw new RangeError("Upper bound must be less than or equal to 2^32.");
-
-    const limit = Math.floor(maxUint32PlusOne / maxExclusive) * maxExclusive;
-    let randomValue = 0;
-
-    do {
-        cryptoProvider.getRandomValues(maxUint32Array);
-        randomValue = maxUint32Array[0];
-    } while (randomValue >= limit);
-
-    return randomValue % maxExclusive;
-}
-
-/**
- * @function getRandomCharacter
- * @description This function generates a secure random character from the provided character set.
+ * @function getCharsetCharacters
+ * @description Validates a character set and returns its unique Unicode characters.
  * @param {string} charset - The character set.
  *
- * @returns {string} A single character randomly selected from the provided character set.
+ * @returns {string[]} The characters from the provided character set.
  */
-function getRandomCharacter(charset) {
+function getCharsetCharacters(charset) {
     if (typeof charset !== "string") throw new TypeError("Character set must be a string.");
-    if (charset.length === 0) throw new RangeError("Character set must not be empty.");
-    if (charset.length > 0x100000000) throw new RangeError("Character set length must be less than or equal to 2^32.");
+    const characters = Array.from(charset);
+    if (characters.length === 0) throw new RangeError("Character set must not be empty.");
+    if (new Set(characters).size !== characters.length) {
+        throw new RangeError("Character set must not contain duplicate characters.");
+    }
 
-    return charset.charAt(getRandomInt(charset.length));
+    return characters;
 }
 
 /**
@@ -76,14 +57,27 @@ function getRandomCharacter(charset) {
  */
 function generatePassword(length = 16, charset) {
     if (typeof length !== "number") throw new TypeError("Password length must be a number.");
-    if (length !== Math.floor(length)) throw new TypeError("Password length must be an integer.");
-    if (length < 1) throw new RangeError("Password length must greater than 0.");
-    if (typeof charset !== "string") throw new TypeError("Character set must be a string.");
-    if (charset.length === 0) throw new RangeError("Character set must not be empty.");
+    if (!Number.isSafeInteger(length)) throw new TypeError("Password length must be a safe integer.");
+    if (length < 1) throw new RangeError("Password length must be greater than 0.");
+    if (length > maxPasswordLength) {
+        throw new RangeError("Password length must be less than or equal to " + maxPasswordLength + ".");
+    }
+
+    const characters = getCharsetCharacters(charset);
+    const maxUint32PlusOne = 0x100000000;
+    const randomValues = new Uint32Array(length);
+    const cryptoProvider = getCryptoProvider();
+    const limit = Math.floor(maxUint32PlusOne / characters.length) * characters.length;
 
     let result = "";
+    cryptoProvider.getRandomValues(randomValues);
+
     for (let i = 0; i < length; ++i) {
-        result += getRandomCharacter(charset);
+        while (randomValues[i] >= limit) {
+            cryptoProvider.getRandomValues(randomValues.subarray(i, i + 1));
+        }
+
+        result += characters[randomValues[i] % characters.length];
     }
 
     return result;
@@ -100,13 +94,16 @@ function generatePassword(length = 16, charset) {
  */
 function calculatePasswordEntropy(length = 0, charset) {
     if (typeof length !== "number") throw new TypeError("Password length must be a number.");
-    if (length !== Math.floor(length)) throw new TypeError("Password length must be an integer.");
-    if (typeof charset !== "string") throw new TypeError("Character set must be a string.");
-    if (charset.length === 0) throw new RangeError("Character set must not be empty.");
+    if (!Number.isSafeInteger(length)) throw new TypeError("Password length must be a safe integer.");
+    if (length > maxPasswordLength) {
+        throw new RangeError("Password length must be less than or equal to " + maxPasswordLength + ".");
+    }
+
+    const characters = getCharsetCharacters(charset);
 
     if (length < 1) return 0;
 
-    return length * Math.log2(charset.length);
+    return length * Math.log2(characters.length);
 }
 
-export {generatePassword, calculatePasswordEntropy};
+export {generatePassword, calculatePasswordEntropy, maxPasswordLength};
