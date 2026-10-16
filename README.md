@@ -35,6 +35,8 @@ separately to each test process. Deterministic tests also check rejection bounda
 - `password.js`: JavaScript script for password generation.
 - `exclusions.js`: Advanced character selection and popover positioning.
 - `theme.js`: Theme preferences and navigation behavior.
+- `assets/custom-css/5924e44.min.css`: Custom CSS bundled from commit
+  `5924e447ccdf61ff001fcee18267213997809d26` (`design`), minified with CSSO 5.0.5 without rule restructuring.
 
 > **Note:** The `password.js` file can be used as a standalone script to generate secure passwords in other project
 > environments.
