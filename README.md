@@ -8,6 +8,7 @@ in mind, all the code is run client-side, no data is stored or sent to a server.
 - Generate cryptographically secure random passwords.
 - Choose the length of the password.
 - Choose to include special characters and/or exclude ambiguous characters.
+- Exclude specific characters; preferences are saved locally, passwords are not.
 - See the password strength based on its entropy.
 
 ## Statistical randomness test
@@ -21,6 +22,7 @@ Run locally:
 node tests/randomness.validation.test.cjs
 node tests/generator.password-randomness.test.cjs
 node tests/policy.password-randomness.test.cjs
+node tests/exclusions.test.cjs
 ```
 
 Statistical tests detect regressions; cryptographic security relies on Web Crypto and unbiased rejection sampling.

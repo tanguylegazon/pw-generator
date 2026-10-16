@@ -21,26 +21,35 @@ const password = document.getElementById('pw-field');
 const passwordAnimation = document.getElementById('pw-animation');
 const passwordLengthInput = document.getElementById('pw-length');
 const refreshButton = document.getElementById('pw-refresh');
-const includeSymbolsCheckbox = document.getElementById('include-symbols');
-const easyCharacters = document.getElementById('easy-characters');
+const avoidSymbolsCheckbox = document.getElementById('avoid-symbols');
+const avoidAmbiguousCheckbox = document.getElementById('avoid-ambiguous');
+const excludedCharacters = document.getElementById('excluded-characters');
+const exclusionsError = document.getElementById('exclusions-error');
 
-includeSymbolsCheckbox.checked = true;
-easyCharacters.checked = false;
+excludedCharacters.value = '';
+for (const key of ['rememberExclusions', 'excludedCharacters']) {
+    if (localStorage.getItem(key) !== null) localStorage.removeItem(key);
+}
 
 
 /*****************
  * Local storage *
  *****************/
-if (localStorage.getItem('includeSymbols') === null) {
-    localStorage.setItem('includeSymbols', includeSymbolsCheckbox.checked);
-} else {
-    includeSymbolsCheckbox.checked = localStorage.getItem('includeSymbols') === 'true';
+if (localStorage.getItem('avoidSymbols') === null) {
+    const allowed = localStorage.getItem('allowSymbols');
+    const excluded = localStorage.getItem('excludeSymbols');
+    localStorage.setItem('avoidSymbols', allowed !== null ? allowed === 'false' : excluded !== null ? excluded === 'true' : localStorage.getItem('includeSymbols') === 'false');
 }
-
-if (localStorage.getItem('easyCharacters') === null) {
-    localStorage.setItem('easyCharacters', easyCharacters.checked);
-} else {
-    easyCharacters.checked = localStorage.getItem('easyCharacters') === 'true';
+if (localStorage.getItem('avoidAmbiguous') === null) {
+    const allowed = localStorage.getItem('allowAmbiguous');
+    localStorage.setItem('avoidAmbiguous', allowed !== null ? allowed === 'false' : localStorage.getItem('easyCharacters') === 'true');
+}
+for (const [checkbox, key] of [[avoidSymbolsCheckbox, 'avoidSymbols'], [avoidAmbiguousCheckbox, 'avoidAmbiguous']]) {
+    if (localStorage.getItem(key) === null) {
+        localStorage.setItem(key, checkbox.checked);
+    } else {
+        checkbox.checked = localStorage.getItem(key) === 'true';
+    }
 }
 
 
@@ -49,6 +58,7 @@ if (localStorage.getItem('easyCharacters') === null) {
  ***********/
 let charset = "";
 let charsetLength = 0;
+let requiredCharsets = [];
 let currentPassword = "";
 let passwordTimeoutId = null;
 let animationFrameId = null;
@@ -60,25 +70,27 @@ const symbolCharset = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 const ambiguousCharset = "012CcIilOoXxZz!\"$&'+,/:;[\\]^`{|}~";
 
 /**
- * @function updateCharset
- * @description This function updates the character set based on the user's input for character.
+ * @function getAvailableCharset
+ * @description Returns the character set allowed by the selected options, before custom exclusions.
  *
  * @returns {string} The complete character set.
  */
-function updateCharset() {
-    charset =
-        includeSymbolsCheckbox.checked ?
+function getAvailableCharset() {
+    const available =
+        !avoidSymbolsCheckbox.checked ?
             digitCharset + lowerCaseCharset + upperCaseCharset + symbolCharset :
             digitCharset + lowerCaseCharset + upperCaseCharset;
 
-    if (easyCharacters.checked) {
-        for (let i = 0; i < ambiguousCharset.length; ++i) {
-            charset =
-                charset.replace(new RegExp(ambiguousCharset[i].replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'g'), '');
-        }
-    }
+    return Array.from(available).filter(char => !avoidAmbiguousCheckbox.checked || !ambiguousCharset.includes(char)).join('');
+}
 
+function updateCharset() {
+    charset = getAvailableCharset();
+    const excluded = new Set(excludedCharacters.value);
+    charset = Array.from(charset).filter(char => !excluded.has(char)).join('');
     charsetLength = charset.length;
+    requiredCharsets = [digitCharset, lowerCaseCharset, upperCaseCharset, symbolCharset]
+        .filter(set => Array.from(set).some(char => charset.includes(char)));
 }
 
 function hasAnyCharacterFromSet(text, set) {
@@ -89,17 +101,8 @@ function hasAnyCharacterFromSet(text, set) {
 }
 
 function matchesUiConstraints(passwordText) {
-    const requiresSymbol = includeSymbolsCheckbox.checked;
-    const requiredClassCount = requiresSymbol ? 4 : 3;
-
-    if (passwordText.length < requiredClassCount) {
-        return true;
-    }
-
-    if (!hasAnyCharacterFromSet(passwordText, digitCharset)) return false;
-    if (!hasAnyCharacterFromSet(passwordText, lowerCaseCharset)) return false;
-    if (!hasAnyCharacterFromSet(passwordText, upperCaseCharset)) return false;
-    return !requiresSymbol || hasAnyCharacterFromSet(passwordText, symbolCharset);
+    if (passwordText.length < requiredCharsets.length) return true;
+    return requiredCharsets.every(set => hasAnyCharacterFromSet(passwordText, set));
 }
 
 function generatePasswordForUi(length) {
@@ -125,6 +128,21 @@ function updatePassword() {
         clearTimeout(passwordTimeoutId);
         passwordTimeoutId = null;
         updateCharset();
+        const empty = charset.length === 0;
+        exclusionsError.hidden = !empty;
+        excludedCharacters.setAttribute('aria-invalid', String(empty));
+        document.getElementById('pw-copy').disabled = empty;
+        refreshButton.disabled = empty;
+        if (empty) {
+            if (animationFrameId !== null) cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+            currentPassword = '';
+            password.value = '';
+            passwordAnimation.hidden = true;
+            password.classList.remove('scrambling');
+            updateEntropyBar(0);
+            return;
+        }
         currentPassword = generatePasswordForUi(Number(passwordLengthInput.value));
         password.value = currentPassword;
         textScrambleEffect(currentPassword);
@@ -186,7 +204,7 @@ function textScrambleEffect(text) {
         }
     }
 
-    animationFrameId = requestAnimationFrame(updateFrame);
+    updateFrame(startTime);
 }
 
 updatePassword();
@@ -223,7 +241,9 @@ function updateEntropyBar(entropy) {
         entropyBar.style.backgroundColor = '#08a070'; // emerald-570
     }
 
-    entropyBar.style.width = Math.min(entropy / entropyForFullBar * 100, 100) + '%';
+    entropyBar.style.inlineSize = Math.min(entropy / entropyForFullBar * 100, 100) + '%';
+    entropyBar.parentElement.setAttribute('aria-valuenow', Math.min(entropy, entropyForFullBar));
+    entropyBar.parentElement.setAttribute('aria-valuetext', Math.round(entropy) + ' bits théoriques');
 }
 
 
@@ -404,15 +424,26 @@ if ('maxTouchPoints' in navigator && navigator.maxTouchPoints > 0) {
 
 refreshButton.addEventListener('click', updatePassword);
 
-includeSymbolsCheckbox.addEventListener('click', () => {
-    localStorage.setItem('includeSymbols', includeSymbolsCheckbox.checked);
-    updatePassword();
+excludedCharacters.addEventListener('input', () => {
+    const value = excludedCharacters.value;
+    const unique = Array.from(new Set(value)).join('');
+    if (value !== unique) {
+        const start = Array.from(new Set(value.slice(0, excludedCharacters.selectionStart))).join('').length;
+        const end = Array.from(new Set(value.slice(0, excludedCharacters.selectionEnd))).join('').length;
+        excludedCharacters.value = unique;
+        excludedCharacters.setSelectionRange(start, end);
+    }
+    const previousCharset = charset;
+    updateCharset();
+    if (charset !== previousCharset) updatePassword();
 });
 
-easyCharacters.addEventListener('click', () => {
-    localStorage.setItem('easyCharacters', easyCharacters.checked);
-    updatePassword();
-});
+for (const [checkbox, key] of [[avoidSymbolsCheckbox, 'avoidSymbols'], [avoidAmbiguousCheckbox, 'avoidAmbiguous']]) {
+    checkbox.addEventListener('change', () => {
+        localStorage.setItem(key, checkbox.checked);
+        updatePassword();
+    });
+}
 
 const refreshButtonSVG = refreshButton.querySelector('svg');
 let refreshTimeoutId = null;
@@ -424,3 +455,5 @@ refreshButton.onclick = () => {
         refreshButtonSVG.classList.remove('rotate'), 750
     );
 };
+
+export {getAvailableCharset};

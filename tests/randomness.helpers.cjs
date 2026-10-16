@@ -53,13 +53,14 @@ function loadUi(generatePassword = loadGenerator().generatePassword) {
     function getElement(id) {
         if (!elements.has(id)) elements.set(id, {
             value: "16", checked: false, style: {},
+            parentElement: {setAttribute() {}},
             classList: {add() {}, remove() {}},
-            addEventListener() {}, querySelector() { return getElement("svg"); },
+            addEventListener() {}, setAttribute() {}, querySelector() { return getElement("svg"); },
         });
         return elements.get(id);
     }
     const source = fs.readFileSync(path.resolve(__dirname, "..", "script.js"), "utf8");
-    const instrumented = source.replace(/^import\s+[^;]+;\s*/m, "");
+    const instrumented = source.replace(/^import\s+[^;]+;\s*/m, "").replace(/^export\s+\{[^}]+\};\s*/m, "");
     assert.notEqual(instrumented, source, "UI import was not found.");
     const context = vm.createContext({
         generatePassword, calculatePasswordEntropy: () => 0, maxPasswordLength: 1024,
@@ -69,9 +70,10 @@ function loadUi(generatePassword = loadGenerator().generatePassword) {
     });
     vm.runInContext(instrumented, context, {timeout: 5000});
     return vm.runInContext(`({
-        configure(symbols, easy) {
-            includeSymbolsCheckbox.checked = symbols;
-            easyCharacters.checked = easy;
+        configure(symbols, easy, excluded = "") {
+            avoidSymbolsCheckbox.checked = !symbols;
+            avoidAmbiguousCheckbox.checked = easy;
+            excludedCharacters.value = excluded;
             updateCharset();
             return {charset, ambiguous: ambiguousCharset,
                 available: digitCharset + lowerCaseCharset + upperCaseCharset + (symbols ? symbolCharset : ""),
