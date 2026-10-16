@@ -1,7 +1,7 @@
 # Password Generator
 
 A simple password generator built using HTML, CSS, and JavaScript. This project is designed with privacy and security
-in mind, all the code is run client-side, no data is stored or sent to a server.
+in mind. All the code runs client-side; passwords are never stored or sent to a server.
 
 ## Features
 
@@ -9,7 +9,9 @@ in mind, all the code is run client-side, no data is stored or sent to a server.
 - Choose the length of the password.
 - Choose to include special characters and/or exclude ambiguous characters.
 - Exclude specific characters for the current session.
-- Remember the two main options and the theme locally; passwords, length and custom exclusions are not saved.
+- Automatically select French or English from browser preferences, with English as the fallback.
+- Choose the interface language from the footer.
+- Remember the two main options, theme and explicit language choice locally; passwords, length and custom exclusions are not saved.
 - See the password strength based on its entropy.
 
 ## Statistical randomness test
@@ -35,9 +37,10 @@ separately to each test process. Deterministic tests also check rejection bounda
 - `password.js`: JavaScript script for password generation.
 - `exclusions.js`: Advanced character selection and popover positioning.
 - `theme.js`: Theme preferences and navigation behavior.
+- `i18n.js`: French and English translations, language detection and preferences.
 
-Custom CSS is loaded through jsDelivr, pinned to distribution commit `370f0b2a059576fae5152d7cae866f2028e1a3b5`,
-built from source commit `a9833458b61dfd1029ebc3282a920ae040cca0ee`. Updates are explicit.
+Custom CSS is loaded through jsDelivr, pinned to distribution commit `8fafeb3be05d00985f0255aa5660b93b39b55069`,
+built from source commit `c002cb4407080f4fabad21b2f1b8c996c9015107`. Updates are explicit.
 
 > **Note:** The `password.js` file can be used as a standalone script to generate secure passwords in other project
 > environments.

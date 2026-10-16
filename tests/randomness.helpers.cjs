@@ -110,7 +110,11 @@ function loadUi(generatePassword = loadGenerator().generatePassword, options = {
     assert.notEqual(instrumented, source, "UI import was not found.");
     const context = vm.createContext({
         generatePassword, calculatePasswordEntropy: loadGenerator().calculatePasswordEntropy, maxPasswordLength: 1024,
-        document: {getElementById: getElement, addEventListener: (...args) => getElement("document").addEventListener(...args)},
+        document: {
+            documentElement: {setAttribute() {}},
+            getElementById: getElement,
+            addEventListener: (...args) => getElement("document").addEventListener(...args),
+        },
         navigator: {maxTouchPoints: options.touch ? 1 : 0, clipboard: options.clipboard || {writeText: async () => {}}},
         localStorage: {
             getItem(key) { if (options.blockRead) throw new Error("Storage denied."); return storage.get(key) ?? null; },
@@ -129,6 +133,7 @@ function loadUi(generatePassword = loadGenerator().generatePassword, options = {
         clearTimeout: id => timers.delete(id), clearInterval: id => timers.delete(id),
         console: {error() {}},
     });
+    vm.runInContext(fs.readFileSync(path.resolve(__dirname, "..", "i18n.js"), "utf8"), context);
     vm.runInContext(instrumented, context, {timeout: 5000});
     const ui = vm.runInContext(`({
         configure(symbols, easy, excluded = "") {

@@ -10,26 +10,30 @@ const list = document.getElementById('character-list');
 const count = document.getElementById('excluded-count');
 
 for (const [name, characters] of [
-    ['Lettres', 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'],
-    ['Chiffres', '0123456789'],
-    ['Symboles', '()[]{}<>.,;:!?\'"`+-=*/\\|_~^%&#@$'],
+    ['letters', 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'],
+    ['digits', '0123456789'],
+    ['symbols', '()[]{}<>.,;:!?\'"`+-=*/\\|_~^%&#@$'],
 ]) {
     const section = document.createElement('details');
     section.className = 'small rounded';
     section.name = 'character-groups';
     const heading = document.createElement('summary');
-    heading.textContent = name;
+    heading.dataset.i18n = name;
+    heading.textContent = i18n.translate(name);
     const group = document.createElement('div');
     group.className = 'character-group';
     group.setAttribute('role', 'group');
-    group.setAttribute('aria-label', name);
+    group.dataset.i18nAriaLabel = name;
+    group.setAttribute('aria-label', i18n.translate(name));
     for (const character of characters) {
         const label = document.createElement('label');
         const input = document.createElement('input');
         input.type = 'checkbox';
         input.className = 'small';
         input.value = character;
-        input.setAttribute('aria-label', 'Autoriser ' + character);
+        input.dataset.i18nAriaLabel = 'allowCharacter';
+        input.dataset.character = character;
+        input.setAttribute('aria-label', i18n.translate('allowCharacter', {character}));
         label.append(input, character);
         group.append(label);
     }

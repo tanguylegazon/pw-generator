@@ -237,8 +237,10 @@ function updateEntropyBar(entropy) {
 
     entropyBar.style.inlineSize = Math.min(entropy / entropyForFullBar * 100, 100) + '%';
     entropyBar.parentElement.setAttribute('aria-valuenow', Math.min(entropy, entropyForFullBar));
-    entropyBar.parentElement.setAttribute('aria-valuetext', Math.round(entropy) + ' bits théoriques');
+    entropyBar.parentElement.setAttribute('aria-valuetext', i18n.translate('entropy', {bits: Math.round(entropy)}));
 }
+
+document.addEventListener('languagechange', updateEntropy);
 
 
 /*************************

@@ -10,20 +10,21 @@ A copy of the license is available at https://github.com/tailwindlabs/heroicons/
 -->
 
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light dark">
+    <script src="i18n.js"></script>
     <script src="theme.js"></script>
-    <title>Tanguy Bonandrini – Générateur de mots de passe</title>
+    <title data-i18n="title">Tanguy Bonandrini – Password generator</title>
     <meta name="description"
-          content="Générateur de mots de passe respectant les bonnes pratiques en matière de sécurité cryptographique et de vie privée des utilisateurs.">
+          data-i18n-content="description" content="Password generator designed with cryptographic security and user privacy in mind.">
     <link rel="canonical" href="https://tanguy-bonandrini.fr/password">
     <link rel="icon" type="image/svg+xml" href="/assets/favicon/favicon.svg"/>
     <link rel="icon" type="image/png" href="/assets/favicon/favicon.png" sizes="96x96"/>
     <link rel="apple-touch-icon" href="/assets/favicon/apple-touch-icon.png" sizes="180x180"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/tanguylegazon/custom-css@370f0b2a059576fae5152d7cae866f2028e1a3b5/custom.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/tanguylegazon/custom-css@8fafeb3be05d00985f0255aa5660b93b39b55069/custom.min.css">
     <link rel="stylesheet" href="style.css">
     <script type="module" src="script.js"></script>
     <script type="module" src="exclusions.js"></script>
@@ -32,19 +33,19 @@ A copy of the license is available at https://github.com/tailwindlabs/heroicons/
 <header class="password-header navbar floating">
     <a class="password-brand" href="#">Password generator</a>
     <div class="theme-control">
-        <svg class="theme-icon-defs" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <svg class="theme-icon-defs" aria-hidden="true">
             <symbol id="theme-light" viewBox="0 0 24 24">
                 <path d="M12 2.25a.75.75 0 0 1 .75.75v2.25a.75.75 0 0 1-1.5 0V3a.75.75 0 0 1 .75-.75ZM7.5 12a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM18.894 6.166a.75.75 0 0 0-1.06-1.06l-1.591 1.59a.75.75 0 1 0 1.06 1.061l1.591-1.59ZM21.75 12a.75.75 0 0 1-.75.75h-2.25a.75.75 0 0 1 0-1.5H21a.75.75 0 0 1 .75.75ZM17.834 18.894a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 1 0-1.061 1.06l1.59 1.591ZM12 18a.75.75 0 0 1 .75.75V21a.75.75 0 0 1-1.5 0v-2.25A.75.75 0 0 1 12 18ZM7.758 17.303a.75.75 0 0 0-1.061-1.06l-1.591 1.59a.75.75 0 0 0 1.06 1.061l1.591-1.59ZM6 12a.75.75 0 0 1-.75.75H3a.75.75 0 0 1 0-1.5h2.25A.75.75 0 0 1 6 12ZM6.697 7.757a.75.75 0 0 0 1.06-1.06l-1.59-1.591a.75.75 0 0 0-1.061 1.06l1.59 1.591Z"/>
             </symbol>
             <symbol id="theme-auto" viewBox="0 0 24 24">
-                <path fill-rule="evenodd" d="M2.25 5.25a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3V15a3 3 0 0 1-3 3h-3v.257c0 .597.237 1.17.659 1.591l.621.622a.75.75 0 0 1-.53 1.28h-9a.75.75 0 0 1-.53-1.28l.621-.622a2.25 2.25 0 0 0 .659-1.59V18h-3a3 3 0 0 1-3-3V5.25Zm1.5 0v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5Z" clip-rule="evenodd"/>
+                <path fill-rule="evenodd" d="M2.25 5.25a3 3 0 0 1 3-3h13.5a3 3 0 0 1 3 3V15a3 3 0 0 1-3 3h-3v.257c0 .597.237 1.17.659 1.591l.621.622a.75.75 0 0 1-.53 1.28h-9a.75.75 0 0 1-.53-1.28l.621-.622a2.25 2.25 0 0 0 .659-1.59V18h-3a3 3 0 0 1-3-3V5.25Zm1.5 0v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5Z"/>
             </symbol>
             <symbol id="theme-dark" viewBox="0 0 24 24">
-                <path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 0 1 .162.819A8.97 8.97 0 0 0 9 6a9 9 0 0 0 9 9 8.97 8.97 0 0 0 3.463-.69.75.75 0 0 1 .981.98 10.503 10.503 0 0 1-9.694 6.46c-5.799 0-10.5-4.7-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 0 1 .818.162Z" clip-rule="evenodd"/>
+                <path fill-rule="evenodd" d="M9.528 1.718a.75.75 0 0 1 .162.819A8.97 8.97 0 0 0 9 6a9 9 0 0 0 9 9 8.97 8.97 0 0 0 3.463-.69.75.75 0 0 1 .981.98 10.503 10.503 0 0 1-9.694 6.46c-5.799 0-10.5-4.7-10.5-10.5 0-4.368 2.667-8.112 6.46-9.694a.75.75 0 0 1 .818.162Z"/>
             </symbol>
         </svg>
         <details class="theme-switch small" data-selected="auto">
-            <summary class="theme-switch-summary" aria-label="Choisir le thème">
+            <summary class="theme-switch-summary" data-i18n-aria-label="chooseTheme" aria-label="Choose theme">
                 <svg data-theme-icon="light" aria-hidden="true"><use href="#theme-light"/></svg>
                 <svg data-theme-icon="auto" aria-hidden="true"><use href="#theme-auto"/></svg>
                 <svg data-theme-icon="dark" aria-hidden="true"><use href="#theme-dark"/></svg>
@@ -53,61 +54,61 @@ A copy of the license is available at https://github.com/tailwindlabs/heroicons/
                     <path d="m4 6 4 4 4-4"/>
                 </svg>
             </summary>
-            <div class="theme-switch-menu" role="group" aria-label="Thème">
+            <div class="theme-switch-menu" role="group" data-i18n-aria-label="theme" aria-label="Theme">
                 <button class="theme-switch-button" type="button" data-theme-value="light" aria-pressed="false">
-                    <svg aria-hidden="true"><use href="#theme-light"/></svg><span>Clair</span>
+                    <svg aria-hidden="true"><use href="#theme-light"/></svg><span data-i18n="light">Light</span>
                 </button>
                 <button class="theme-switch-button" type="button" data-theme-value="auto" aria-pressed="true">
-                    <svg aria-hidden="true"><use href="#theme-auto"/></svg><span>Auto</span>
+                    <svg aria-hidden="true"><use href="#theme-auto"/></svg><span data-i18n="auto">Auto</span>
                 </button>
                 <button class="theme-switch-button" type="button" data-theme-value="dark" aria-pressed="false">
-                    <svg aria-hidden="true"><use href="#theme-dark"/></svg><span>Sombre</span>
+                    <svg aria-hidden="true"><use href="#theme-dark"/></svg><span data-i18n="dark">Dark</span>
                 </button>
             </div>
         </details>
     </div>
 </header>
 <main class="container">
-    <h1 class="visually-hidden">Générateur de mots de passe</h1>
+    <h1 class="visually-hidden" data-i18n="heading">Password generator</h1>
     <div class="password-inputs">
-        <div class="stepper large rounded" title="Longueur du mot de passe">
-            <button id="pw-length-decrease" class="ghost" aria-label="Diminuer la taille du mot de passe">
-                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <div class="stepper large rounded" data-i18n-title="passwordLength" title="Password length">
+            <button id="pw-length-decrease" class="ghost" data-i18n-aria-label="decreaseLength" aria-label="Decrease password length">
+                <svg viewBox="0 0 16 16" aria-hidden="true">
                     <path d="M3.75 7.25a.75.75 0 0 0 0 1.5h8.5a.75.75 0 0 0 0-1.5h-8.5Z"/>
                 </svg>
             </button>
-            <input id="pw-length" type="text" inputmode="numeric" value="16" aria-label="Longueur du mot de passe"/>
-            <button id="pw-length-increase" class="ghost" aria-label="Augmenter la taille du mot de passe">
-                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <input id="pw-length" type="text" inputmode="numeric" value="16" data-i18n-aria-label="passwordLength" aria-label="Password length"/>
+            <button id="pw-length-increase" class="ghost" data-i18n-aria-label="increaseLength" aria-label="Increase password length">
+                <svg viewBox="0 0 16 16" aria-hidden="true">
                     <path d="M8.75 3.75a.75.75 0 0 0-1.5 0v3.5h-3.5a.75.75 0 0 0 0 1.5h3.5v3.5a.75.75 0 0 0 1.5 0v-3.5h3.5a.75.75 0 0 0 0-1.5h-3.5v-3.5Z"/>
                 </svg>
             </button>
         </div>
         <div class="password-field">
-            <label for="pw-field" class="visually-hidden">Mot de passe généré</label>
+            <label for="pw-field" class="visually-hidden" data-i18n="generatedPassword">Generated password</label>
             <input id="pw-field" class="large rounded" type="text" readonly>
             <input id="pw-animation" class="large rounded" type="text" tabindex="-1" aria-hidden="true" readonly hidden>
-            <button id="pw-refresh" class="ghost large rounded" aria-label="Générer un nouveau mot de passe"
+            <button id="pw-refresh" class="ghost large rounded" data-i18n-aria-label="regenerate" aria-label="Generate a new password"
                     aria-controls="pw-field">
-                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <svg viewBox="0 0 16 16" aria-hidden="true">
                     <path d="M13.836 2.477a.75.75 0 0 1 .75.75v3.182a.75.75 0 0 1-.75.75h-3.182a.75.75 0 0 1 0-1.5h1.37l-.84-.841a4.5 4.5 0 0 0-7.08.932.75.75 0 0 1-1.3-.75 6 6 0 0 1 9.44-1.242l.842.84V3.227a.75.75 0 0 1 .75-.75Zm-.911 7.5A.75.75 0 0 1 13.199 11a6 6 0 0 1-9.44 1.241l-.84-.84v1.371a.75.75 0 0 1-1.5 0V9.591a.75.75 0 0 1 .75-.75H5.35a.75.75 0 0 1 0 1.5H3.98l.841.841a4.5 4.5 0 0 0 7.08-.932.75.75 0 0 1 1.025-.273Z"/>
                 </svg>
             </button>
             <div class="password-entropy rounded" role="meter" aria-valuemin="0" aria-valuemax="128"
-                 aria-valuenow="0" aria-label="Robustesse du mot de passe">
+                 aria-valuenow="0" data-i18n-aria-label="strength" aria-label="Password strength">
                 <div id="entropy-bar" class="rounded-full"></div>
             </div>
         </div>
 
-        <button id="pw-copy" class="large rounded" aria-label="Copier le mot de passe">
-            <svg class="copied" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <button id="pw-copy" class="large rounded" data-i18n-aria-label="copyPassword" aria-label="Copy password">
+            <svg class="copied" viewBox="0 0 16 16" aria-hidden="true">
                 <path d="M12.42 4.13C12.58 4.24 12.7 4.41 12.74 4.6C12.77 4.8 12.73 5.0 12.62 5.17L7.62 12.67C7.56 12.76 7.48 12.84 7.39 12.89C7.29 12.95 7.18 12.99 7.07 13.0C6.96 13.01 6.85 12.99 6.75 12.96C6.64 12.92 6.55 12.86 6.47 12.78L3.47 9.78C3.34 9.64 3.27 9.45 3.27 9.26C3.27 9.06 3.35 8.88 3.49 8.74C3.63 8.6 3.81 8.52 4.01 8.52C4.2 8.52 4.39 8.59 4.53 8.72L6.88 11.07L11.38 4.33C11.49 4.17 11.66 4.05 11.85 4.01C12.05 3.98 12.25 4.02 12.42 4.13Z"/>
             </svg>
-            <svg class="copy" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <svg class="copy" viewBox="0 0 16 16" aria-hidden="true">
                 <path d="M6 3.5C6 3.1 6.16 2.72 6.44 2.44C6.72 2.16 7.1 2 7.5 2H10.38C10.78 2 11.16 2.16 11.44 2.44L13.56 4.56C13.7 4.7 13.81 4.86 13.89 5.05C13.96 5.23 14 5.42 14 5.62V9.5C14 9.9 13.84 10.28 13.56 10.56C13.28 10.84 12.9 11 12.5 11V8.62C12.5 7.83 12.18 7.06 11.62 6.5L9.5 4.38C8.94 3.82 8.17 3.5 7.38 3.5H6Z"/>
                 <path d="M4.5 5C4.1 5 3.72 5.16 3.44 5.44C3.16 5.72 3 6.1 3 6.5V12.5C3 12.9 3.16 13.28 3.44 13.56C3.72 13.84 4.1 14 4.5 14H9.5C9.9 14 10.28 13.84 10.56 13.56C10.84 13.28 11 12.9 11 12.5V8.62C11 8.22 10.84 7.84 10.56 7.56L8.44 5.44C8.3 5.3 8.13 5.19 7.95 5.11C7.77 5.04 7.58 5 7.38 5H4.5Z"/>
             </svg>
-            <span class="copy">Copier</span>
+            <span class="copy" data-i18n="copy">Copy</span>
         </button>
     </div>
 
@@ -115,24 +116,24 @@ A copy of the license is available at https://github.com/tailwindlabs/heroicons/
         <div class="password-options">
             <label>
                 <input id="avoid-symbols" class="toggle rounded" type="checkbox">
-                Éviter les caractères spéciaux
+                <span data-i18n="avoidSymbols">Avoid special characters</span>
             </label>
             <label>
                 <input id="avoid-ambiguous" class="toggle rounded" type="checkbox">
-                Éviter les caractères ambigus
+                <span data-i18n="avoidAmbiguous">Avoid ambiguous characters</span>
             </label>
         </div>
         <button id="advanced-options" class="ghost rounded" popovertarget="exclusions-panel">
-            Options avancées<span id="excluded-count" hidden></span>
+            <span data-i18n="advancedOptions">Advanced options</span><span id="excluded-count" hidden></span>
         </button>
     </div>
-    <p id="exclusions-error" class="danger" role="alert" hidden>Aucun caractère disponible. Modifiez les options ou les exclusions.</p>
-    <p id="copy-error" class="danger" role="alert" hidden>Copie impossible. Copiez manuellement le mot de passe sélectionné.</p>
+    <p id="exclusions-error" class="danger" role="alert" data-i18n="noCharacters" hidden>No characters available. Change the options or exclusions.</p>
+    <p id="copy-error" class="danger" role="alert" data-i18n="copyFailed" hidden>Unable to copy. Copy the selected password manually.</p>
 
-    <div id="exclusions-panel" class="exclusions small" popover aria-label="Options avancées">
+    <div id="exclusions-panel" class="exclusions small" popover data-i18n-aria-label="advancedOptions" aria-label="Advanced options">
         <div class="exclusions-heading">
-            <label for="excluded-characters">Caractères exclus</label>
-            <button id="reset-exclusions" class="ghost small rounded" aria-label="Réinitialiser les exclusions">Réinitialiser</button>
+            <label for="excluded-characters" data-i18n="excludedCharacters">Excluded characters</label>
+            <button id="reset-exclusions" class="ghost small rounded" data-i18n="reset" data-i18n-aria-label="resetExclusions" aria-label="Reset exclusions">Reset</button>
         </div>
         <input id="excluded-characters" class="small rounded" type="text" autocomplete="off" spellcheck="false"
                aria-describedby="exclusions-error">
@@ -145,19 +146,30 @@ A copy of the license is available at https://github.com/tailwindlabs/heroicons/
 
 <footer>
     <p class="privacy-note">
-        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 16 16" aria-hidden="true">
             <path fill-rule="evenodd"
                   d="M8.5 1.709a.75.75 0 0 0-1 0 8.963 8.963 0 0 1-4.84 2.217.75.75 0 0 0-.654.72 10.499 10.499 0 0 0 5.647 9.672.75.75 0 0 0 .694-.001 10.499 10.499 0 0 0 5.647-9.672.75.75 0 0 0-.654-.719A8.963 8.963 0 0 1 8.5 1.71Zm2.34 5.504a.75.75 0 0 0-1.18-.926L7.394 9.17l-1.156-.99a.75.75 0 1 0-.976 1.138l1.75 1.5a.75.75 0 0 0 1.078-.106l2.75-3.5Z"/>
         </svg>
-        <span>Vos mots de passe restent sur votre appareil.</span>
+        <span data-i18n="privacy">Your passwords stay on your device.</span>
     </p>
-    <a class="github-link" href="https://github.com/tanguylegazon/pw-generator" target="_blank" rel="noopener noreferrer"
-       aria-label="Voir le code source sur GitHub">
-        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-            <path d="M32.03 0.64C14.32 0.64 0 15.04 0 32.86C0 47.1 9.17 59.16 21.9 63.43C23.49 63.75 24.07 62.73 24.07 61.88C24.07 61.13 24.02 58.57 24.02 55.91C15.11 57.83 13.26 52.06 13.26 52.06C11.82 48.33 9.7 47.37 9.7 47.37C6.79 45.4 9.92 45.4 9.92 45.4C13.15 45.61 14.85 48.7 14.85 48.7C17.71 53.61 22.32 52.22 24.18 51.37C24.44 49.29 25.29 47.85 26.19 47.05C19.09 46.3 11.61 43.53 11.61 31.15C11.61 27.63 12.88 24.75 14.9 22.51C14.58 21.71 13.47 18.4 15.22 13.98C15.22 13.98 17.92 13.12 24.02 17.28C26.63 16.58 29.32 16.22 32.03 16.22C34.73 16.22 37.49 16.59 40.03 17.28C46.13 13.12 48.83 13.98 48.83 13.98C50.59 18.4 49.47 21.71 49.15 22.51C51.22 24.75 52.44 27.63 52.44 31.15C52.44 43.53 44.96 46.25 37.81 47.05C38.97 48.06 39.98 49.98 39.98 53.02C39.98 57.35 39.93 60.81 39.93 61.88C39.93 62.73 40.51 63.75 42.1 63.43C54.83 59.16 64 47.1 64 32.86C64.05 15.04 49.68 0.64 32.03 0.64Z"/>
-        </svg>
-        <span>GitHub</span>
-    </a>
+    <div>
+        <div class="language-control">
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"/>
+            </svg>
+            <select id="language" class="ghost small" data-i18n-aria-label="language" aria-label="Language" autocomplete="off">
+                <option value="fr" lang="fr">Français</option>
+                <option value="en" lang="en" selected>English</option>
+            </select>
+        </div>
+        <a class="github-link" href="https://github.com/tanguylegazon/pw-generator" target="_blank" rel="noopener noreferrer"
+           data-i18n-aria-label="sourceCode" aria-label="View the source code on GitHub">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+                <path d="M32.03 0.64C14.32 0.64 0 15.04 0 32.86C0 47.1 9.17 59.16 21.9 63.43C23.49 63.75 24.07 62.73 24.07 61.88C24.07 61.13 24.02 58.57 24.02 55.91C15.11 57.83 13.26 52.06 13.26 52.06C11.82 48.33 9.7 47.37 9.7 47.37C6.79 45.4 9.92 45.4 9.92 45.4C13.15 45.61 14.85 48.7 14.85 48.7C17.71 53.61 22.32 52.22 24.18 51.37C24.44 49.29 25.29 47.85 26.19 47.05C19.09 46.3 11.61 43.53 11.61 31.15C11.61 27.63 12.88 24.75 14.9 22.51C14.58 21.71 13.47 18.4 15.22 13.98C15.22 13.98 17.92 13.12 24.02 17.28C26.63 16.58 29.32 16.22 32.03 16.22C34.73 16.22 37.49 16.59 40.03 17.28C46.13 13.12 48.83 13.98 48.83 13.98C50.59 18.4 49.47 21.71 49.15 22.51C51.22 24.75 52.44 27.63 52.44 31.15C52.44 43.53 44.96 46.25 37.81 47.05C38.97 48.06 39.98 49.98 39.98 53.02C39.98 57.35 39.93 60.81 39.93 61.88C39.93 62.73 40.51 63.75 42.1 63.43C54.83 59.16 64 47.1 64 32.86C64.05 15.04 49.68 0.64 32.03 0.64Z"/>
+            </svg>
+            <span>GitHub</span>
+        </a>
+    </div>
 </footer>
 </body>
 </html>

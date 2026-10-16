@@ -38,13 +38,12 @@
 
         const group = document.querySelector('.theme-switch');
         const buttons = group.querySelectorAll('.theme-switch-button');
-        const labels = {light: 'Clair', auto: 'Auto', dark: 'Sombre'};
 
         function syncTheme(theme) {
             applyTheme(theme);
             const selected = root.dataset.theme || 'auto';
             group.dataset.selected = selected;
-            group.querySelector('.theme-current-label').textContent = labels[selected];
+            group.querySelector('.theme-current-label').textContent = i18n.translate(selected);
             buttons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.themeValue === selected)));
         }
 
@@ -71,6 +70,7 @@
         window.addEventListener('storage', event => {
             if (event.key === storageKey || event.key === null) syncTheme(readTheme());
         });
+        document.addEventListener('languagechange', () => syncTheme(root.dataset.theme || 'auto'));
         syncTheme(readTheme());
     });
 })();
