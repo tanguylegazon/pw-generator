@@ -56,9 +56,7 @@
             try {
                 if (theme === 'auto') localStorage.removeItem(storageKey);
                 else localStorage.setItem(storageKey, theme);
-            } catch (_) {
-                // Theme switching remains available without storage.
-            }
+            } catch {}
         }));
 
         document.addEventListener('click', event => {

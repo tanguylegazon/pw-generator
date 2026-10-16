@@ -16,6 +16,7 @@ for (const [name, characters] of [
 ]) {
     const section = document.createElement('details');
     section.className = 'small rounded';
+    section.name = 'character-groups';
     const heading = document.createElement('summary');
     heading.textContent = name;
     const group = document.createElement('div');
@@ -26,7 +27,7 @@ for (const [name, characters] of [
         const label = document.createElement('label');
         const input = document.createElement('input');
         input.type = 'checkbox';
-        input.className = 'toggle small rounded';
+        input.className = 'small';
         input.value = character;
         input.setAttribute('aria-label', 'Autoriser ' + character);
         label.append(input, character);
@@ -34,6 +35,9 @@ for (const [name, characters] of [
     }
     section.append(heading, group);
     list.append(section);
+    section.addEventListener('toggle', () => {
+        if (section.open) list.scrollTop = section.offsetTop - list.offsetTop;
+    });
 }
 
 function updateChoices() {

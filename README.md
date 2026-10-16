@@ -8,7 +8,8 @@ in mind, all the code is run client-side, no data is stored or sent to a server.
 - Generate cryptographically secure random passwords.
 - Choose the length of the password.
 - Choose to include special characters and/or exclude ambiguous characters.
-- Exclude specific characters; preferences are saved locally, passwords are not.
+- Exclude specific characters for the current session.
+- Remember the two main options and the theme locally; passwords, length and custom exclusions are not saved.
 - See the password strength based on its entropy.
 
 ## Statistical randomness test
@@ -19,13 +20,12 @@ patterns, correlations and successive outputs. UI generation rules are checked a
 Run locally:
 
 ```sh
-node tests/randomness.validation.test.cjs
-node tests/generator.password-randomness.test.cjs
-node tests/policy.password-randomness.test.cjs
-node tests/exclusions.test.cjs
+node --test tests/*.test.cjs
 ```
 
 Statistical tests detect regressions; cryptographic security relies on Web Crypto and unbiased rejection sampling.
+Passing these tests does not prove unpredictability or perfect randomness. The statistical error budget applies
+separately to each test process. Deterministic tests also check rejection boundaries and deliberately biased generators.
 
 ## Project files
 
@@ -33,6 +33,8 @@ Statistical tests detect regressions; cryptographic security relies on Web Crypt
 - `style.css`: CSS styles for layout and visual elements.
 - `script.js`: Main JavaScript script for UI interactions and display.
 - `password.js`: JavaScript script for password generation.
+- `exclusions.js`: Advanced character selection and popover positioning.
+- `theme.js`: Theme preferences and navigation behavior.
 
 > **Note:** The `password.js` file can be used as a standalone script to generate secure passwords in other project
 > environments.
@@ -44,10 +46,9 @@ Statistical tests detect regressions; cryptographic security relies on Web Crypt
 To use this generator, you can either:
 
 1. Access the live version at [tanguy-bonandrini.fr/password](https://tanguy-bonandrini.fr/password).
-2. Clone this repository and open `index.html` in your web browser or use a local web server.
+2. Clone this repository and serve it with a local web server.
 
-> **Note:** The `script.js` and `password.js` files use ES6 features and must be included as modules. Some browsers 
-> may require a web server to run the project locally.
+> **Note:** JavaScript modules require HTTP(S); opening `index.html` directly is not supported.
 
 ## License and third-party licenses
 

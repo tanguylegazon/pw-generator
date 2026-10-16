@@ -47,14 +47,16 @@ body {
 }
 
 .container {
+    --action-width: 11rem;
+    container-type: inline-size;
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 1.25rem;
-    max-inline-size: 44rem;
-    padding-block: 4rem;
+    max-inline-size: 48rem;
+    padding-block: clamp(2rem, 8svh, 4rem);
 }
 
 .visually-hidden {
@@ -76,7 +78,7 @@ body {
 .password-inputs {
     display: grid;
     align-items: center;
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr) var(--action-width);
     gap: .75rem;
     inline-size: 100%;
 }
@@ -84,19 +86,27 @@ body {
 .password-settings {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     align-items: center;
     gap: .75rem;
     inline-size: 100%;
 }
 
 .password-options {
+    flex: 1 1 max-content;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-start;
     gap: .5rem;
 }
 
 .password-options label {
+    flex: 1;
+    white-space: nowrap;
+}
+
+#advanced-options {
+    flex: 0 0 auto;
+    min-inline-size: var(--action-width);
+    margin-inline: auto;
     white-space: nowrap;
 }
 
@@ -116,7 +126,6 @@ body {
 #pw-animation {
     position: absolute;
     inset: 0;
-    inline-size: 100%;
     block-size: 100%;
     background-color: transparent;
     border-color: transparent;
@@ -139,7 +148,7 @@ body {
 }
 
 #pw-refresh svg.rotate {
-    animation: rotation 750ms ease-in;
+    animation: rotation var(--duration-slower) var(--ease-standard);
 }
 
 .password-entropy {
@@ -153,6 +162,10 @@ body {
 }
 
 #entropy-bar {
+    --strength-danger: light-dark(oklch(.62 .20 25), var(--palette-dark-danger-8));
+    --strength-warning: light-dark(oklch(.644 .157 55), var(--palette-dark-warning-8));
+    --strength-good: light-dark(oklch(.615 .16 140), var(--palette-dark-success-8));
+    --strength-excellent: light-dark(oklch(.50 .09 165), oklch(.64 .11 165));
     inline-size: 0;
     block-size: .15rem;
     transition: background-color var(--duration-slower) var(--ease-standard), inline-size var(--duration-slower) var(--ease-standard);
@@ -178,7 +191,7 @@ body {
     position: fixed;
     inset: auto;
     margin: 0;
-    inline-size: 24rem;
+    inline-size: 28rem;
     overflow: hidden;
     --overlay-padding: .75rem;
 }
@@ -208,7 +221,7 @@ body {
 .character-list {
     display: grid;
     gap: .5rem;
-    max-block-size: 15rem;
+    max-block-size: 22rem;
     min-block-size: 0;
     overflow-y: auto;
     padding: .25rem;
@@ -217,13 +230,24 @@ body {
 
 .character-group {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(3.25rem, 1fr));
-    gap: .35rem;
+    grid-template-columns: repeat(auto-fit, minmax(2.75rem, 1fr));
+    gap: .125rem .25rem;
     font-family: var(--font-mono);
+}
+
+.character-group label {
+    display: flex;
+    align-items: center;
+    gap: .5em;
+    min-block-size: var(--control-height);
 }
 
 .character-list details {
     padding: .5rem;
+}
+
+.character-list details::details-content {
+    transition: none;
 }
 
 .exclusions input:not([type="checkbox"]) {
@@ -240,14 +264,10 @@ body {
 }
 
 footer {
-    padding-inline: max(1rem, calc((100% - 44rem) / 2));
+    padding-inline: max(1rem, calc((100% - 48rem) / 2));
 }
 
-@media (max-width: 40rem) {
-    .container {
-        padding-block: clamp(2rem, 8svh, 4rem);
-    }
-
+@container (max-width: 37rem) {
     .password-inputs {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -269,22 +289,13 @@ footer {
         justify-self: end;
     }
 
-    .password-options {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr);
-        inline-size: 100%;
-    }
-
-    .password-options label {
-        justify-content: center;
-    }
-
     #advanced-options {
+        flex-basis: 100%;
         inline-size: 100%;
     }
 }
 
-@media (max-width: 22rem) {
+@container (max-width: 19rem) {
     #pw-copy .copy:not(svg) {
         display: none;
     }
