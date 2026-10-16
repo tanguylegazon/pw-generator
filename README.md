@@ -35,9 +35,9 @@ separately to each test process. Deterministic tests also check rejection bounda
 - `password.js`: JavaScript script for password generation.
 - `exclusions.js`: Advanced character selection and popover positioning.
 - `theme.js`: Theme preferences and navigation behavior.
-- `assets/custom-css/370f0b2.min.css`: Custom CSS distribution pinned to commit
-  `370f0b2a059576fae5152d7cae866f2028e1a3b5`, built from source commit
-  `a9833458b61dfd1029ebc3282a920ae040cca0ee`. Updates are explicit; the stylesheet is served locally.
+
+Custom CSS is loaded through jsDelivr, pinned to distribution commit `370f0b2a059576fae5152d7cae866f2028e1a3b5`,
+built from source commit `a9833458b61dfd1029ebc3282a920ae040cca0ee`. Updates are explicit.
 
 Script and page stylesheet URLs share a cache version. Update it in `index.html` and module imports when these
 files change, keeping the `script.js` URL identical in the HTML and `exclusions.js` to avoid duplicate initialization.
