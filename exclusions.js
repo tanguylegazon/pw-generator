@@ -3,7 +3,7 @@
  * If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import {getAvailableCharset} from './script.js?v=8fa0eff';
+import {getAvailableCharset} from './script.js';
 
 const exclusions = document.getElementById('excluded-characters');
 const list = document.getElementById('character-list');

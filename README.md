@@ -39,9 +39,6 @@ separately to each test process. Deterministic tests also check rejection bounda
 Custom CSS is loaded through jsDelivr, pinned to distribution commit `370f0b2a059576fae5152d7cae866f2028e1a3b5`,
 built from source commit `a9833458b61dfd1029ebc3282a920ae040cca0ee`. Updates are explicit.
 
-Script and page stylesheet URLs share a cache version. Update it in `index.html` and module imports when these
-files change, keeping the `script.js` URL identical in the HTML and `exclusions.js` to avoid duplicate initialization.
-
 > **Note:** The `password.js` file can be used as a standalone script to generate secure passwords in other project
 > environments.
 

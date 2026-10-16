@@ -3,7 +3,7 @@
  * If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-import {generatePassword, calculatePasswordEntropy, maxPasswordLength} from './password.js?v=8fa0eff';
+import {generatePassword, calculatePasswordEntropy, maxPasswordLength} from './password.js';
 
 const minPasswordLength = 1;
 
