@@ -3,14 +3,9 @@
  * If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-/**
- * @constant {number} maxPasswordLength
- * @description The maximum length that a password can be.
- */
 const maxPasswordLength = 1024;
 
 /**
- * @function getCryptoProvider
  * @description Returns a valid crypto provider exposing getRandomValues in browser or Node.js.
  *
  * @returns {Crypto} A crypto provider.
@@ -20,19 +15,10 @@ function getCryptoProvider() {
         return globalThis.crypto;
     }
 
-    if (
-        typeof window !== "undefined"
-        && typeof window.crypto !== "undefined"
-        && typeof window.crypto.getRandomValues === "function"
-    ) {
-        return window.crypto;
-    }
-
     throw new Error("Secure random generator is not available in this environment.");
 }
 
 /**
- * @function getCharsetCharacters
  * @description Validates a character set and returns its unique Unicode characters.
  * @param {string} charset - The character set.
  *
@@ -50,7 +36,6 @@ function getCharsetCharacters(charset) {
 }
 
 /**
- * @function generatePassword
  * @description This function generates a password with independent, uniform random draws from the provided charset.
  *
  * @returns {string} The generated password.
@@ -84,7 +69,6 @@ function generatePassword(length = 16, charset) {
 }
 
 /**
- * @function calculatePasswordEntropy
  * @description This function calculates the entropy of a password based on the user's input for length and character
  * set.
  * @param {number} length - The length of the password.

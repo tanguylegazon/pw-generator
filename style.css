@@ -3,81 +3,132 @@
  * If a copy of the MPL was not distributed with this file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 
-:root {
-    --btn-breakpoint: calc(2.5 * var(--btn-width));
+body {
+    display: flex;
+    flex-direction: column;
 }
 
-body {
-    margin: 0;
-    padding: 0;
-    height: 100svh;
+.password-header {
+    --navbar-expanded-width: 100%;
+    --navbar-expanded-margin: 0;
+    --navbar-expanded-padding: max(1.25rem, calc((100vw - var(--content-width)) / 2));
+    border-radius: 0;
+}
+
+.password-header:not([data-scrolled]) {
+    inline-size: min(75rem, calc(100% - 2.5rem));
+    margin-inline: auto;
+}
+
+.password-header .theme-switch {
+    font-size: .8125rem;
+}
+
+.password-brand {
+    color: var(--color-text);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.privacy-note svg {
+    min-inline-size: 1.15em;
+}
+
+.privacy-note {
     display: flex;
-    justify-content: center;
+    align-items: center;
+    gap: .65em;
+    margin: 0;
+}
+
+.privacy-note svg, .github-link svg {
+    flex-shrink: 0;
+    inline-size: 1em;
 }
 
 .container {
-    box-sizing: border-box;
+    --action-width: 11rem;
+    container-type: inline-size;
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2.2em;
-    padding: 30px;
+    gap: 1.25rem;
+    max-inline-size: 48rem;
+    padding-block: clamp(2rem, 8svh, 4rem);
 }
 
-.hidden {
+.visually-hidden {
     position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
+    inline-size: 1px;
+    block-size: 1px;
     padding: 0;
-    border: 0;
     overflow: hidden;
-    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
 }
 
-.password-inputs, .password-options {
+.password-options, .github-link {
     display: flex;
-    flex-direction: row;
+    align-items: center;
+    gap: .75rem;
+}
+
+.password-inputs {
+    display: grid;
+    align-items: center;
+    grid-template-columns: auto minmax(0, 1fr) var(--action-width);
+    gap: .75rem;
+    inline-size: 100%;
+}
+
+.password-settings {
+    display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: center;
-    gap: 2.2em;
-    row-gap: .9em;
+    gap: .75rem;
+    inline-size: 100%;
 }
 
-.password-length {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: .4rem;
+.password-options {
+    flex: 1 1 max-content;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: .5rem;
 }
 
-#pw-length {
-    width: 4ch;
-    text-align: center;
+.password-options label {
+    flex: 1;
+    white-space: nowrap;
+}
+
+#advanced-options {
+    flex: 0 0 auto;
+    min-inline-size: var(--action-width);
+    margin-inline: auto;
+    white-space: nowrap;
 }
 
 .password-field {
     position: relative;
+    min-inline-size: 0;
 }
 
 #pw-field, #pw-animation {
-    font-family: ui-monospace, monospace;
-    padding-right: calc(var(--button-height) - 2px);
+    --color-field-border: var(--color-border);
+    inline-size: 100%;
+    padding-inline-end: var(--control-height);
+    font-family: var(--font-mono);
+    transition: none;
 }
 
 #pw-animation {
+    position: absolute;
+    inset: 0;
+    block-size: 100%;
     background-color: transparent;
     border-color: transparent;
-    box-shadow: none;
-    backdrop-filter: none;
-    box-sizing: border-box;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
     pointer-events: none;
 }
 
@@ -87,129 +138,166 @@ body {
 
 #pw-refresh {
     position: absolute;
-    top: 50%;
-    right: 1px;
+    inset-block-start: 50%;
+    inset-inline-end: 1px;
     transform: translateY(-50%);
-    backdrop-filter: none;
-    z-index: 10;
-}
-
-#pw-refresh svg {
-    will-change: rotate;
+    background: transparent;
+    box-shadow: none;
+    block-size: calc(100% - 2px);
+    min-block-size: 0;
 }
 
 #pw-refresh svg.rotate {
-    animation: rotation 750ms ease-in;
+    animation: rotation var(--duration-slower) var(--ease-standard);
 }
 
 .password-entropy {
+    position: absolute;
+    inset: 2px;
     display: flex;
     align-items: flex-end;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    font-size: 1.25em;
-    height: 100%;
-    padding: 0 .25em;
-    border-radius: var(--border-radius);
     overflow: hidden;
-    box-sizing: border-box;
-    border: .1em solid transparent;
+    border-radius: calc(var(--radius-rounded) - 2px);
     pointer-events: none;
 }
 
 #entropy-bar {
-    width: 0;
-    background-color: #84cc16; /* lime-500 */
-    height: .12em;
-    border-radius: .5em;
-    transition: background-color var(--duration-long) ease, width var(--duration-long) ease;
+    --strength-danger: light-dark(oklch(.62 .20 25), var(--palette-dark-danger-8));
+    --strength-warning: light-dark(oklch(.644 .157 55), var(--palette-dark-warning-8));
+    --strength-good: light-dark(oklch(.615 .16 140), var(--palette-dark-success-8));
+    --strength-excellent: light-dark(oklch(.50 .09 165), oklch(.64 .11 165));
+    inline-size: 0;
+    block-size: .15rem;
+    transition: background-color var(--duration-slower) var(--ease-standard), inline-size var(--duration-slower) var(--ease-standard);
+}
+
+#pw-copy {
+    position: relative;
 }
 
 #pw-copy .copied {
     position: absolute;
-    bottom: 50%;
-    right: 50%;
-    transform: translate(50%, 50%);
-    height: calc(var(--button-height) - 2 * .55em + 2px);
-    display: inline;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    transform: translate(-50%, -50%);
     opacity: 0;
-    transition: opacity var(--duration-short) ease;
 }
 
-#pw-copy .copy {
-    opacity: 1;
-    transition: opacity var(--duration-short) ease;
+#pw-copy .copy, #pw-copy .copied {
+    transition: opacity var(--duration-fast) var(--ease-functional);
 }
 
-#pw-copy span {
-    display: none;
-    font-weight: 600;
+.exclusions {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    inline-size: 28rem;
+    overflow: hidden;
+    --overlay-padding: .75rem;
 }
 
-.password-options {
-    row-gap: 1.05em;
+.exclusions:popover-open {
+    display: flex;
+    flex-direction: column;
 }
 
-@media (max-width: 45rem) {
-    .password-field {
-        order: 1;
-    }
+.exclusions-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: .5rem;
+    flex-shrink: 0;
+    margin-block-start: .75rem;
+}
 
-    #pw-field, #pw-animation {
-        width: calc(100vw - 2 * var(--padding-x) - 30px - 2 * 30px);
-    }
+.exclusions-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    flex-shrink: 0;
+}
 
+.character-list {
+    display: grid;
+    gap: .5rem;
+    max-block-size: 22rem;
+    min-block-size: 0;
+    overflow-y: auto;
+    padding: .25rem;
+    margin-block: .5rem 0;
+}
+
+.character-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(2.75rem, 1fr));
+    gap: .125rem .25rem;
+    font-family: var(--font-mono);
+}
+
+.character-group label {
+    display: flex;
+    align-items: center;
+    gap: .5em;
+    min-block-size: var(--control-height);
+}
+
+.character-list details {
+    padding: .5rem;
+}
+
+.character-list details::details-content {
+    transition: none;
+}
+
+.exclusions input:not([type="checkbox"]) {
+    display: block;
+    flex-shrink: 0;
+    inline-size: 100%;
+    margin-block: .5rem;
+    font-family: var(--font-mono);
+}
+
+.github-link {
+    gap: .65em;
+    text-decoration: none;
+}
+
+footer {
+    padding-inline: max(1rem, calc((100% - 48rem) / 2));
+}
+
+@container (max-width: 37rem) {
     .password-inputs {
-        justify-content: space-between;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .password-field {
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+
+    .password-inputs .stepper {
+        grid-column: 1;
+        grid-row: 1;
+        justify-self: start;
+    }
+
+    #pw-copy {
+        grid-column: 2;
+        grid-row: 1;
+        justify-self: end;
+    }
+
+    #advanced-options {
+        flex-basis: 100%;
+        inline-size: 100%;
     }
 }
 
-@media (max-width: 35rem) {
-    .password-options {
-        margin-top: 1em;
-    }
-
-    .password-options .btn {
-        width: 100%;
-        box-shadow: none;
-    }
-}
-
-@media (max-width: 45rem) {
-    @media (min-width: 24rem) {
-        #pw-copy {
-            border-radius: var(--border-radius);
-            aspect-ratio: unset;
-        }
-
-        #pw-copy span {
-            display: inline;
-        }
-    }
-
-    @media (max-height: 34rem) {
-        .info-banner {
-            display: none;
-        }
-
-        @media (max-height: 28rem) {
-            .github-banner {
-                display: none;
-            }
-        }
-    }
-}
-
-@media (max-height: 22rem) {
-    .info-banner {
+@container (max-width: 19rem) {
+    #pw-copy .copy:not(svg) {
         display: none;
-    }
-
-    @media (max-height: 18rem) {
-        .github-banner {
-            display: none;
-        }
     }
 }
 
@@ -228,5 +316,11 @@ body {
     }
     100% {
         transform: rotate(180deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #pw-refresh svg.rotate {
+        animation: none;
     }
 }

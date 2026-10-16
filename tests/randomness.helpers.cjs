@@ -48,30 +48,93 @@ function loadGenerator(crypto = webcrypto) {
  * @function loadUi
  * @description Executes script.js with a minimal DOM; generation and charset rules remain production code.
  */
-function loadUi(generatePassword = loadGenerator().generatePassword) {
+function loadUi(generatePassword = loadGenerator().generatePassword, options = {}) {
     const elements = new Map();
+    const storage = new Map(Object.entries(options.storage || {}));
+    const timers = new Map();
+    const frames = new Map();
+    let now = 0;
+    let timerId = 0;
+    let frameId = 0;
     function getElement(id) {
-        if (!elements.has(id)) elements.set(id, {
-            value: "16", checked: false, style: {},
-            classList: {add() {}, remove() {}},
-            addEventListener() {}, querySelector() { return getElement("svg"); },
-        });
+        if (!elements.has(id)) {
+            const classes = new Set();
+            const listeners = new Map();
+            const attributes = new Map();
+            const animation = {currentTime: 100};
+            elements.set(id, {
+                value: id === "pw-length" ? "16" : "", checked: false, hidden: true, style: {},
+                selectionStart: 0, selectionEnd: 0,
+                parentElement: {setAttribute() {}},
+                classList: {add: name => classes.add(name), remove: name => classes.delete(name), contains: name => classes.has(name)},
+                addEventListener(type, callback) {
+                    if (!listeners.has(type)) listeners.set(type, []);
+                    listeners.get(type).push(callback);
+                },
+                async emit(type, event = {}) {
+                    for (const callback of listeners.get(type) || []) await callback.call(this, {
+                        target: this, preventDefault() {}, ...event,
+                    });
+                },
+                setAttribute: (name, value) => attributes.set(name, value),
+                getAttribute: name => attributes.get(name),
+                querySelector() { return getElement("svg"); },
+                querySelectorAll(selector) { return [getElement(selector)]; },
+                getAnimations: () => [animation],
+                setPointerCapture() {},
+                setSelectionRange(start, end) { this.selectionStart = start; this.selectionEnd = end; },
+                focus() {}, select() { this.selected = true; },
+            });
+        }
         return elements.get(id);
     }
+    function schedule(callback, delay, repeat = false) {
+        timers.set(++timerId, {callback, time: now + delay, delay, repeat});
+        return timerId;
+    }
+    function advance(milliseconds) {
+        const end = now + milliseconds;
+        while (true) {
+            const next = [...timers].filter(([, timer]) => timer.time <= end).sort((a, b) => a[1].time - b[1].time)[0];
+            if (!next) break;
+            const [id, timer] = next;
+            now = timer.time;
+            if (timer.repeat) timer.time += timer.delay;
+            else timers.delete(id);
+            timer.callback();
+        }
+        now = end;
+    }
     const source = fs.readFileSync(path.resolve(__dirname, "..", "script.js"), "utf8");
-    const instrumented = source.replace(/^import\s+[^;]+;\s*/m, "");
+    const instrumented = source.replace(/^import\s+[^;]+;\s*/m, "").replace(/^export\s+\{[^}]+\};\s*/m, "");
     assert.notEqual(instrumented, source, "UI import was not found.");
     const context = vm.createContext({
-        generatePassword, calculatePasswordEntropy: () => 0, maxPasswordLength: 1024,
-        document: {getElementById: getElement}, navigator: {},
-        localStorage: {getItem: () => null, setItem() {}},
-        window: {matchMedia: () => ({matches: true})}, clearTimeout() {},
+        generatePassword, calculatePasswordEntropy: loadGenerator().calculatePasswordEntropy, maxPasswordLength: 1024,
+        document: {getElementById: getElement, addEventListener: (...args) => getElement("document").addEventListener(...args)},
+        navigator: {maxTouchPoints: options.touch ? 1 : 0, clipboard: options.clipboard || {writeText: async () => {}}},
+        localStorage: {
+            getItem(key) { if (options.blockRead) throw new Error("Storage denied."); return storage.get(key) ?? null; },
+            setItem(key, value) { if (options.blockWrite) throw new Error("Storage denied."); storage.set(key, String(value)); },
+            removeItem(key) { storage.delete(key); },
+        },
+        window: {
+            matchMedia: () => ({matches: options.reducedMotion !== false}),
+            addEventListener: (...args) => getElement("window").addEventListener(...args),
+        },
+        performance: {now: () => now},
+        requestAnimationFrame(callback) { frames.set(++frameId, callback); return frameId; },
+        cancelAnimationFrame: id => frames.delete(id),
+        setTimeout: (callback, delay) => schedule(callback, delay),
+        setInterval: (callback, delay) => schedule(callback, delay, true),
+        clearTimeout: id => timers.delete(id), clearInterval: id => timers.delete(id),
+        console: {error() {}},
     });
     vm.runInContext(instrumented, context, {timeout: 5000});
-    return vm.runInContext(`({
-        configure(symbols, easy) {
-            includeSymbolsCheckbox.checked = symbols;
-            easyCharacters.checked = easy;
+    const ui = vm.runInContext(`({
+        configure(symbols, easy, excluded = "") {
+            avoidSymbolsCheckbox.checked = !symbols;
+            avoidAmbiguousCheckbox.checked = easy;
+            excludedCharacters.value = excluded;
             updateCharset();
             return {charset, ambiguous: ambiguousCharset,
                 available: digitCharset + lowerCaseCharset + upperCaseCharset + (symbols ? symbolCharset : ""),
@@ -80,6 +143,7 @@ function loadUi(generatePassword = loadGenerator().generatePassword) {
         },
         generate: generatePasswordForUi
     })`, context);
+    return Object.assign(ui, {getElement, storage, advance, frames, timers});
 }
 
 function report(name, samples) {
