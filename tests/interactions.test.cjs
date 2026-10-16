@@ -104,3 +104,24 @@ test("An empty pool clears the password and recovers when exclusions are removed
     assert.equal(ui.getElement("pw-copy").disabled, false);
     assert.equal(ui.getElement("exclusions-error").hidden, true);
 });
+
+test("Language changes preserve strength while the pool is empty or length is being edited", async () => {
+    const ui = loadUi();
+    const password = ui.getElement("pw-field");
+    const initialPassword = password.value;
+    const strength = ui.getElement("entropy-bar").style.inlineSize;
+    for (const value of ["", "2048"]) {
+        ui.getElement("pw-length").value = value;
+        await ui.getElement("pw-length").emit("input");
+        await ui.getElement("document").emit("languagechange");
+        assert.equal(password.value, initialPassword);
+        assert.equal(ui.getElement("entropy-bar").style.inlineSize, strength);
+    }
+    ui.getElement("pw-length").value = "16";
+    const exclusions = ui.getElement("excluded-characters");
+    exclusions.value = ui.configure(true, false).charset;
+    await exclusions.emit("input");
+    await ui.getElement("document").emit("languagechange");
+    assert.equal(password.value, "");
+    assert.equal(ui.getElement("entropy-bar").style.inlineSize, "0%");
+});

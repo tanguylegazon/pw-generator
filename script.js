@@ -142,7 +142,7 @@ function updatePassword() {
             updateEntropyBar(0);
             return;
         }
-        currentPassword = generatePasswordForUi(Number(passwordLengthInput.value));
+        currentPassword = generatePasswordForUi(length);
         password.value = currentPassword;
         textScrambleEffect(currentPassword);
         updateEntropy();
@@ -213,7 +213,7 @@ updatePassword();
  * Entropy *
  ***********/
 function updateEntropy() {
-    const entropy = calculatePasswordEntropy(Number(passwordLengthInput.value), charset);
+    const entropy = charset ? calculatePasswordEntropy(currentPassword.length, charset) : 0;
     updateEntropyBar(entropy);
 }
 

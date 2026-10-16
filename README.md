@@ -39,8 +39,8 @@ separately to each test process. Deterministic tests also check rejection bounda
 - `theme.js`: Theme preferences and navigation behavior.
 - `i18n.js`: French and English translations, language detection and preferences.
 
-Custom CSS is loaded through jsDelivr, pinned to distribution commit `8fafeb3be05d00985f0255aa5660b93b39b55069`,
-built from source commit `c002cb4407080f4fabad21b2f1b8c996c9015107`. Updates are explicit.
+Custom CSS is loaded through jsDelivr, pinned to distribution commit `dfdf1f3ed4a6fe4434e1aaa5d1ed3b12575ec559`,
+built from source commit `b31d28944307bbe0c9b66af0288d41cc21676df2`. Updates are explicit.
 
 > **Note:** The `password.js` file can be used as a standalone script to generate secure passwords in other project
 > environments.

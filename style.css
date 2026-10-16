@@ -28,12 +28,6 @@ body {
     font-size: .8125rem;
 }
 
-.password-brand {
-    color: var(--color-text);
-    font-weight: 600;
-    text-decoration: none;
-}
-
 .privacy-note svg {
     min-inline-size: 1.15em;
 }
@@ -76,7 +70,6 @@ body {
 .password-options, .github-link {
     display: flex;
     align-items: center;
-    gap: .75rem;
 }
 
 .password-inputs {
@@ -142,7 +135,6 @@ body {
     inset-inline-start: .8em;
     inline-size: 1rem;
     block-size: 1rem;
-    fill: none;
     pointer-events: none;
 }
 
