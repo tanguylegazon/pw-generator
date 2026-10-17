@@ -225,9 +225,9 @@ function updateEntropy() {
 function updateEntropyBar(entropy) {
     const entropyBar = document.getElementById('entropy-bar');
 
-    if (entropy < 50) {
+    if (entropy < 48) {
         entropyBar.style.backgroundColor = 'var(--strength-danger)';
-    } else if (entropy < 80) {
+    } else if (entropy < 96) {
         entropyBar.style.backgroundColor = 'var(--strength-warning)';
     } else if (entropy < 128) {
         entropyBar.style.backgroundColor = 'var(--strength-good)';
