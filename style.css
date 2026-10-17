@@ -327,12 +327,6 @@ footer > div {
     }
 }
 
-@container (max-width: 19rem) {
-    #pw-copy .copy:not(svg) {
-        display: none;
-    }
-}
-
 @keyframes rotation {
     0% {
         transform: rotate(0deg);
