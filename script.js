@@ -7,7 +7,7 @@ import {generatePassword, calculatePasswordEntropy, maxPasswordLength} from './p
 
 const minPasswordLength = 1;
 
-const entropyForFullBar = 150;
+const entropyForFullBar = 128;
 
 const password = document.getElementById('pw-field');
 const passwordAnimation = document.getElementById('pw-animation');
@@ -219,7 +219,7 @@ function updateEntropy() {
 
 /**
  * @description Updates the color and width of the entropy bar based on the entropy value. The bar width is maxed out
- * at 150 bits of entropy.
+ * at 128 bits of entropy.
  * @param {number} entropy - The entropy value of the password.
  */
 function updateEntropyBar(entropy) {
@@ -227,9 +227,9 @@ function updateEntropyBar(entropy) {
 
     if (entropy < 48) {
         entropyBar.style.backgroundColor = 'var(--strength-danger)';
-    } else if (entropy < 96) {
+    } else if (entropy < 80) {
         entropyBar.style.backgroundColor = 'var(--strength-warning)';
-    } else if (entropy < 128) {
+    } else if (entropy < 112) {
         entropyBar.style.backgroundColor = 'var(--strength-good)';
     } else {
         entropyBar.style.backgroundColor = 'var(--strength-excellent)';
