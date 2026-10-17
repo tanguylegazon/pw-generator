@@ -47,7 +47,7 @@ for (const [name, characters] of [
 function updateChoices() {
     const excluded = new Set(exclusions.value);
     const available = getAvailableCharset();
-    count.textContent = excluded.size ? '(' + excluded.size + ')' : '';
+    count.textContent = excluded.size ? ' (' + excluded.size + ')' : '';
     count.hidden = excluded.size === 0;
     for (const input of list.querySelectorAll('input')) {
         input.disabled = !available.includes(input.value);

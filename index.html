@@ -124,7 +124,7 @@ A copy of the license is available at https://github.com/tailwindlabs/heroicons/
             </label>
         </div>
         <button id="advanced-options" class="ghost rounded" popovertarget="exclusions-panel">
-            <span data-i18n="advancedOptions">Advanced options</span><span id="excluded-count" hidden></span>
+            <span><span data-i18n="advancedOptions">Advanced options</span><span id="excluded-count" hidden></span></span>
         </button>
     </div>
     <p id="exclusions-error" class="danger" role="alert" data-i18n="noCharacters" hidden>No characters available. Change the options or exclusions.</p>
@@ -136,7 +136,8 @@ A copy of the license is available at https://github.com/tailwindlabs/heroicons/
             <button id="reset-exclusions" class="ghost small rounded" data-i18n="reset" data-i18n-aria-label="resetExclusions" aria-label="Reset exclusions">Reset</button>
         </div>
         <input id="excluded-characters" class="small rounded" type="text" autocomplete="off" spellcheck="false"
-               aria-describedby="exclusions-error">
+               aria-describedby="exclusions-hint exclusions-error">
+        <p id="exclusions-hint" class="muted" data-i18n="exclusionsHint">Enter the characters to exclude, without spaces.</p>
         <div id="character-list" class="character-list"></div>
         <div class="exclusions-actions">
             <button class="small rounded" popovertarget="exclusions-panel" popovertargetaction="hide">OK</button>

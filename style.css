@@ -102,20 +102,10 @@ body {
 }
 
 #advanced-options {
-    position: relative;
     flex: 0 0 auto;
     inline-size: var(--action-width);
     margin-inline: auto;
     white-space: nowrap;
-    padding-inline: calc(1.25em + 2ch);
-}
-
-#excluded-count {
-    position: absolute;
-    inset-inline-end: .5em;
-    inline-size: 4ch;
-    font-size: .75em;
-    font-variant-numeric: tabular-nums;
 }
 
 .container > [role="alert"] {
@@ -248,6 +238,10 @@ body {
     justify-content: space-between;
     gap: .5rem;
     flex-shrink: 0;
+}
+
+#exclusions-hint {
+    margin: 0;
 }
 
 .character-list {
