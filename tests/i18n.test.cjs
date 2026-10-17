@@ -46,6 +46,10 @@ function loadLanguage(languages, options = {}) {
                 if (options.blockStorage) throw new Error("Storage denied.");
                 storage.set(key, value);
             },
+            removeItem(key) {
+                if (options.blockStorage) throw new Error("Storage denied.");
+                storage.delete(key);
+            },
         },
         window: {addEventListener(type, callback) { listeners.window.set(type, callback); }},
     });
@@ -154,6 +158,37 @@ test("Browser changes and storage events respect an explicit language choice", (
     ui.navigator.languages = ["ja"];
     ui.listeners.window.get("storage")({key: null});
     assert.equal(ui.document.documentElement.lang, "en");
+});
+
+test("Choosing the detected language clears the preference and resumes browser detection", () => {
+    for (const [languages, detected, other] of [
+        [["en-US", "fr"], "en", "fr"],
+        [["fr-CA", "en"], "fr", "en"],
+        [["de", "fr-FR"], "fr", "en"],
+        [["ja"], "en", "fr"],
+    ]) {
+        const ui = loadLanguage(languages, {storage: {"password-language": other, unrelated: "kept"}});
+        ui.ready();
+        ui.choose(detected);
+        assert.equal(ui.document.documentElement.lang, detected);
+        assert(!ui.storage.has("password-language"));
+        assert.equal(ui.storage.get("unrelated"), "kept");
+        const reloaded = loadLanguage([other], {storage: Object.fromEntries(ui.storage)});
+        assert.equal(reloaded.document.documentElement.lang, other);
+        ui.navigator.languages = [other];
+        ui.listeners.window.get("languagechange")();
+        assert.equal(ui.document.documentElement.lang, other);
+    }
+});
+
+test("Returning to automatic detection works even when storage is blocked", () => {
+    const ui = loadLanguage(["en"], {blockStorage: true});
+    ui.ready();
+    ui.choose("fr");
+    ui.choose("en");
+    ui.navigator.languages = ["fr"];
+    ui.listeners.window.get("languagechange")();
+    assert.equal(ui.document.documentElement.lang, "fr");
 });
 
 test("Both dictionaries cover every static and dynamically generated message", () => {

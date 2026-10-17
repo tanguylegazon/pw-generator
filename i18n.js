@@ -123,10 +123,11 @@ const i18n = (() => {
         try {
             applyLanguage();
             document.getElementById('language').addEventListener('change', event => {
-                preferredLanguage = event.target.value;
-                language = preferredLanguage;
+                language = event.target.value;
+                preferredLanguage = language === detectLanguage() ? null : language;
                 try {
-                    localStorage.setItem(storageKey, language);
+                    if (preferredLanguage) localStorage.setItem(storageKey, preferredLanguage);
+                    else localStorage.removeItem(storageKey);
                 } catch {}
                 applyLanguage();
             });
