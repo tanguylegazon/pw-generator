@@ -71,7 +71,7 @@ const digitCharset = "0123456789";
 const lowerCaseCharset = "abcdefghijklmnopqrstuvwxyz";
 const upperCaseCharset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const symbolCharset = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-const ambiguousCharset = "012CcIilOoXxZz!\"$&'+,/:;[\\]^`{|}~";
+const ambiguousCharset = "0Oo1Iil|!2Zz5Ss8B\"'`.,\\:;<>^~";
 
 /**
  * @description Returns the character set allowed by the selected options, before custom exclusions.
@@ -103,8 +103,8 @@ function hasAnyCharacterFromSet(text, set) {
 }
 
 function matchesUiConstraints(passwordText) {
-    if (passwordText.length < requiredCharsets.length) return true;
-    return requiredCharsets.every(set => hasAnyCharacterFromSet(passwordText, set));
+    return requiredCharsets.filter(set => hasAnyCharacterFromSet(passwordText, set)).length
+        === Math.min(passwordText.length, requiredCharsets.length);
 }
 
 function generatePasswordForUi(length) {

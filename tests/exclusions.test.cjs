@@ -5,18 +5,22 @@ const ui = loadUi();
 const digits = "0123456789";
 const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
+assert.equal(ui.configure(true, true).charset,
+    "34679abcdefghjkmnpqrtuvwxyACDEFGHJKLMNPQRTUVWXY#$%&()*+-/=?@[]_{}");
+assert.equal(ui.configure(false, true).charset,
+    "34679abcdefghjkmnpqrtuvwxyACDEFGHJKLMNPQRTUVWXY");
+
 for (const excluded of ["", "0O1Il", "[]\\^-", "aaa😀", digits, letters, digits + letters]) {
     const {charset, classes} = ui.configure(true, false, excluded);
     assert(charset.length > 0);
     assert(Array.from(charset).every(char => !excluded.includes(char)));
-    for (const length of [1, 3, 16]) {
+    for (const length of [1, 2, 3, 4, 16]) {
         for (let i = 0; i < 100; ++i) {
             const password = ui.generate(length);
             assert.equal(password.length, length);
             assert(Array.from(password).every(char => charset.includes(char)));
-            if (length >= classes.filter(set => set.length).length) {
-                assert(classes.filter(set => set.length).every(set => set.some(char => password.includes(char))));
-            }
+            assert.equal(classes.filter(set => set.some(char => password.includes(char))).length,
+                Math.min(length, classes.filter(set => set.length).length));
         }
     }
 }

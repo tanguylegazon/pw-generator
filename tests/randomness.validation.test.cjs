@@ -10,7 +10,7 @@ const {completionProbability, runScenario} = require("./policy.password-randomne
 function validateProbabilityModel() {
     for (let length = 0; length <= 6; ++length) {
         for (let initialMask = 0; initialMask < 4; ++initialMask) {
-            let accepted = 0;
+            const accepted = [0, 0, 0];
             for (let word = 0; word < 4 ** length; ++word) {
                 let value = word;
                 let mask = initialMask;
@@ -18,9 +18,12 @@ function validateProbabilityModel() {
                     mask |= value % 4 === 0 ? 1 : 2;
                     value = Math.floor(value / 4);
                 }
-                if (mask === 3) ++accepted;
+                const categories = Number(Boolean(mask & 1)) + Number(Boolean(mask & 2));
+                for (let required = 0; required <= categories; ++required) ++accepted[required];
             }
-            assert.equal(completionProbability([0.25, 0.75], length, initialMask), accepted / 4 ** length);
+            for (let required = 0; required <= 2; ++required) {
+                assert.equal(completionProbability([0.25, 0.75], length, initialMask, required), accepted[required] / 4 ** length);
+            }
         }
     }
 }

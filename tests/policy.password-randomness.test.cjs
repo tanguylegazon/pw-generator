@@ -3,9 +3,9 @@ const {checkCount, loadUi, report} = require("./randomness.helpers.cjs");
 
 /**
  * @function completionProbability
- * @description Computes the probability of completing all required classes by dynamic programming.
+ * @description Computes the probability of reaching the required number of classes by dynamic programming.
  */
-function completionProbability(probabilities, length, initialMask) {
+function completionProbability(probabilities, length, initialMask, required = probabilities.length) {
     let states = new Float64Array(1 << probabilities.length);
     states[initialMask] = 1;
     for (let position = 0; position < length; ++position) {
@@ -17,16 +17,18 @@ function completionProbability(probabilities, length, initialMask) {
         }
         states = next;
     }
-    return states[states.length - 1];
+    return states.reduce((total, probability, mask) => total
+        + (probabilities.filter((_, category) => mask & (1 << category)).length >= required ? probability : 0), 0);
 }
 
 /**
  * @function runScenario
  * @description Checks actual UI outputs against uniform sampling conditioned on the required categories.
  */
-function runScenario(ui, symbols, easy, length, samples) {
-    const {charset, classes, available, ambiguous} = ui.configure(symbols, easy);
-    const expectedCharset = new Set(Array.from(available).filter(char => !easy || !ambiguous.includes(char)));
+function runScenario(ui, symbols, easy, length, samples, excluded = "") {
+    const {charset, classes: allClasses, available, ambiguous} = ui.configure(symbols, easy, excluded);
+    const classes = allClasses.filter(category => category.length);
+    const expectedCharset = new Set(Array.from(available).filter(char => (!easy || !ambiguous.includes(char)) && !excluded.includes(char)));
     assert.deepEqual(new Set(charset), expectedCharset, "UI charset does not match the selected options.");
     const characters = Array.from(charset);
     const size = characters.length;
@@ -35,8 +37,8 @@ function runScenario(ui, symbols, easy, length, samples) {
     const probabilities = classes.map(category => category.length / size);
     assert(classes.every(category => category.length > 0), "Empty UI category.");
     assert.equal(classes.reduce((total, category) => total + category.length, 0), size);
-    const constrained = length >= classes.length;
-    const acceptance = constrained ? completionProbability(probabilities, length, 0) : 1;
+    const required = Math.min(length, classes.length);
+    const acceptance = completionProbability(probabilities, length, 0, required);
     const positions = Array.from({length}, () => new Uint32Array(size));
     const pairs = new Uint32Array(classes.length ** 2);
     for (let sample = 0; sample < samples; ++sample) {
@@ -49,15 +51,14 @@ function runScenario(ui, symbols, easy, length, samples) {
             ++positions[position][index];
             mask |= 1 << categoryOf[index];
         }
-        if (constrained) assert.equal(mask, (1 << classes.length) - 1, "Missing required category.");
+        assert.equal(classes.filter((_, category) => mask & (1 << category)).length, required, "Missing required category.");
         if (length > 1) {
             const pair = categoryOf[indices.get(password[0])] * classes.length + categoryOf[indices.get(password[1])];
             ++pairs[pair];
         }
     }
     for (let index = 0; index < size; ++index) {
-        const probability = (constrained
-            ? completionProbability(probabilities, length - 1, 1 << categoryOf[index]) / acceptance : 1) / size;
+        const probability = completionProbability(probabilities, length - 1, 1 << categoryOf[index], required) / acceptance / size;
         for (let position = 0; position < length; ++position) {
             const name = "UI position " + position + ", character " + index;
             checkCount(positions[position][index], samples, probability, name);
@@ -66,8 +67,8 @@ function runScenario(ui, symbols, easy, length, samples) {
     if (length > 1) {
         for (let first = 0; first < classes.length; ++first) {
             for (let second = 0; second < classes.length; ++second) {
-                const probability = probabilities[first] * probabilities[second] * (constrained
-                    ? completionProbability(probabilities, length - 2, (1 << first) | (1 << second)) / acceptance : 1);
+                const probability = probabilities[first] * probabilities[second]
+                    * completionProbability(probabilities, length - 2, (1 << first) | (1 << second), required) / acceptance;
                 const name = "UI category pair " + first + "," + second;
                 checkCount(pairs[first * classes.length + second], samples, probability, name);
             }
@@ -84,6 +85,12 @@ function main() {
                 runScenario(ui, symbols, easy, length, 20000);
                 samples += 20000;
             }
+        }
+    }
+    for (const excluded of ["123456789", "abcdefghijklmnopqrstuvwxyz", "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"]) {
+        for (const length of [1, 2, 3, 4]) {
+            runScenario(ui, true, false, length, 20000, excluded);
+            samples += 20000;
         }
     }
     report("UI statistics passed", samples);
