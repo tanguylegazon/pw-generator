@@ -266,6 +266,9 @@ body {
     display: flex;
     align-items: center;
     gap: .5em;
+}
+
+.character-group label {
     min-block-size: var(--control-height);
 }
 
