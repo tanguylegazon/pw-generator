@@ -261,7 +261,8 @@ body {
     font-family: var(--font-mono);
 }
 
-.character-group label {
+.character-group label,
+.character-list summary label {
     display: flex;
     align-items: center;
     gap: .5em;

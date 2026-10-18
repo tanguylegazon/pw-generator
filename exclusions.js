@@ -18,8 +18,15 @@ for (const [name, characters] of [
     section.className = 'small rounded';
     section.name = 'character-groups';
     const heading = document.createElement('summary');
-    heading.dataset.i18n = name;
-    heading.textContent = i18n.translate(name);
+    const label = document.createElement('label');
+    const selection = document.createElement('input');
+    selection.type = 'checkbox';
+    selection.className = 'small';
+    const title = document.createElement('span');
+    title.dataset.i18n = name;
+    title.textContent = i18n.translate(name);
+    label.append(selection, title);
+    heading.append(label);
     const group = document.createElement('div');
     group.className = 'character-group';
     group.setAttribute('role', 'group');
@@ -49,16 +56,33 @@ function updateChoices() {
     const available = getAvailableCharset();
     count.textContent = excluded.size ? ' (' + excluded.size + ')' : '';
     count.hidden = excluded.size === 0;
-    for (const input of list.querySelectorAll('input')) {
-        input.disabled = !available.includes(input.value);
-        input.checked = !input.disabled && !excluded.has(input.value);
+    for (const section of list.querySelectorAll('details')) {
+        const inputs = Array.from(section.querySelectorAll('.character-group input'));
+        for (const input of inputs) {
+            input.disabled = !available.includes(input.value);
+            input.checked = !input.disabled && !excluded.has(input.value);
+        }
+        const checked = inputs.filter(input => input.checked).length;
+        const selection = section.querySelector('summary input');
+        selection.disabled = inputs.every(input => input.disabled);
+        selection.checked = checked === inputs.length;
+        selection.indeterminate = checked > 0 && checked < inputs.length;
     }
 }
 
 list.addEventListener('change', event => {
     const excluded = new Set(exclusions.value);
-    if (event.target.checked) excluded.delete(event.target.value);
-    else excluded.add(event.target.value);
+    const summary = event.target.closest('summary');
+    const inputs = summary
+        ? event.target.closest('details').querySelectorAll('.character-group input')
+        : [event.target];
+    const checked = summary
+        ? Array.from(inputs).some(input => !input.disabled && !input.checked)
+        : event.target.checked;
+    for (const input of inputs) {
+        if (checked) excluded.delete(input.value);
+        else excluded.add(input.value);
+    }
     exclusions.value = Array.from(excluded).join('');
     exclusions.dispatchEvent(new Event('input', {bubbles: true}));
 });
